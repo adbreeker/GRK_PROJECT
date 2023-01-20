@@ -19,7 +19,16 @@ const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
 int WIDTH = 800, HEIGHT = 800;
 
-namespace models {
+namespace models 
+{
+	// structures
+	Core::RenderContext roomContext;
+	Core::RenderContext roofContext;
+	Core::RenderContext floorContext;
+
+	//furnitures
+	Core::RenderContext sphereContext;
+	Core::RenderContext windowContext;
 	Core::RenderContext bedContext;
 	Core::RenderContext chairContext;
 	Core::RenderContext deskContext;
@@ -28,12 +37,6 @@ namespace models {
 	Core::RenderContext marbleBustContext;
 	Core::RenderContext materaceContext;
 	Core::RenderContext pencilsContext;
-	Core::RenderContext planeContext;
-	Core::RenderContext roomContext;
-	Core::RenderContext spaceshipContext;
-	Core::RenderContext sphereContext;
-	Core::RenderContext windowContext;
-	Core::RenderContext testContext;
 }
 
 GLuint depthMapFBO;
@@ -49,23 +52,23 @@ Core::Shader_Loader shaderLoader;
 Core::RenderContext shipContext;
 Core::RenderContext sphereContext;
 
-glm::vec3 sunPos = glm::vec3(-4.740971f, 2.149999f, 0.369280f);
 glm::vec3 sunDir = glm::vec3(-0.93633f, 0.351106, 0.003226f);
-glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f)*5;
+glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f);
+float sunForce = 5;
 
 glm::vec3 cameraPos = glm::vec3(0.479490f, 1.250000f, -2.124680f);
 glm::vec3 cameraDir = glm::vec3(-0.354510f, 0.000000f, 0.935054f);
 
 
-glm::vec3 spaceshipPos = glm::vec3(0.065808f, 1.250000f, -2.189549f);
-glm::vec3 spaceshipDir = glm::vec3(-0.490263f, 0.000000f, 0.871578f);
+glm::vec3 spaceshipPos = glm::vec3(0, 1.250000f, -10);
+glm::vec3 spaceshipDir = glm::vec3(-0.0f, 0.000000f, 1.0f);
 GLuint VAO,VBO;
 
 float aspectRatio = 1.f;
 
 float exposition = 1.f;
 
-glm::vec3 pointlightPos = glm::vec3(0, 1.5f, 0);
+glm::vec3 pointlightPos = glm::vec3(0, 15.0f, 0);
 glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6);
 
 glm::vec3 spotlightPos = glm::vec3(0, 0, 0);
@@ -142,7 +145,7 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 	glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 
 	glUniform3f(glGetUniformLocation(program, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
-	glUniform3f(glGetUniformLocation(program, "sunColor"), sunColor.x, sunColor.y, sunColor.z);
+	glUniform3f(glGetUniformLocation(program, "sunColor"), sunColor.x * sunForce, sunColor.y * sunForce, sunColor.z * sunForce);
 
 	glUniform3f(glGetUniformLocation(program, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
 	glUniform3f(glGetUniformLocation(program, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
@@ -177,16 +180,26 @@ void renderScene(GLFWwindow* window)
 	updateDeltaTime(time);
 	renderShadowapSun();
 
-	//space lamp
+	//sun
 	glUseProgram(programSun);
-	glm::mat4 translate = glm::translate(glm::vec3(0, 1, 0));
+	pointlightPos = glm::vec3(glm::eulerAngleZ(0.01f) * glm::vec4(pointlightPos, 0));
+	sunDir = -pointlightPos;
+	if (pointlightPos.y < 0)
+	{
+		sunForce = 0;
+	}
+	else
+	{
+		sunForce = pointlightPos.y/3;
+	}
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
-	glm::mat4 transformation = viewProjectionMatrix * glm::translate(pointlightPos) * translate * glm::scale(glm::vec3(0.4));
+	glm::mat4 transformation = viewProjectionMatrix * glm::translate(pointlightPos) * glm::scale(glm::vec3(0.7));
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x / 2, sunColor.y / 2, sunColor.z / 2);
+	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x * 2.5f, sunColor.y * 2.5f, sunColor.z * 2.5f);
 	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
 	Core::DrawContext(sphereContext);
 
+	//ground
 	viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	transformation = viewProjectionMatrix * glm::translate(glm::vec3(0,-9868.55f,0)) * glm::scale(glm::vec3(10000));
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -204,8 +217,9 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::marbleBustContext, glm::mat4(), glm::vec3(1.f, 1.f, 1.f), 0.5f, 1.0f);
 	drawObjectPBR(models::materaceContext, glm::mat4(), glm::vec3(0.9f, 0.9f, 0.9f), 0.8f, 0.0f);
 	drawObjectPBR(models::pencilsContext, glm::mat4(), glm::vec3(0.10039f, 0.018356f, 0.001935f), 0.1f, 0.0f);
-	drawObjectPBR(models::planeContext, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
 	drawObjectPBR(models::roomContext, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), 0.8f, 0.0f);
+	drawObjectPBR(models::roofContext, glm::mat4(), glm::vec3(40.0f, 0.0f, 0.0f), 0.8f, 0.0f);
+	drawObjectPBR(models::floorContext, glm::mat4(), glm::vec3(5,0,0), 1.0f, 1.0f);
 	drawObjectPBR(models::windowContext, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
@@ -223,7 +237,7 @@ void renderScene(GLFWwindow* window)
 	//	glm::vec3(0.3, 0.3, 0.5)
 	//	);
 	drawObjectPBR(shipContext,
-		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.03f)),
+		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
 		glm::vec3(0.3, 0.3, 0.5),
 		0.2,1.0
 	);
@@ -273,7 +287,7 @@ void init(GLFWwindow* window)
 	programSun = shaderLoader.CreateProgram("shaders/shader_8_sun.vert", "shaders/shader_8_sun.frag");
 
 	loadModelToContext("./models/sphere.obj", sphereContext);
-	loadModelToContext("./models/spaceship.obj", shipContext);
+	loadModelToContext("./models/fly.obj", shipContext);
 
 
 	loadModelToContext("./models/bed.obj", models::bedContext);
@@ -284,13 +298,11 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/marbleBust.obj", models::marbleBustContext);
 	loadModelToContext("./models/materace.obj", models::materaceContext);
 	loadModelToContext("./models/pencils.obj", models::pencilsContext);
-	loadModelToContext("./models/plane.obj", models::planeContext);
 	loadModelToContext("./models/room.obj", models::roomContext);
-	loadModelToContext("./models/spaceship.obj", models::spaceshipContext);
+	loadModelToContext("./models/roof.obj", models::roofContext);
+	loadModelToContext("./models/floor.obj", models::floorContext);
 	loadModelToContext("./models/sphere.obj", models::sphereContext);
 	loadModelToContext("./models/window.obj", models::windowContext);
-	loadModelToContext("./models/test.obj", models::testContext);
-	
 }
 
 
@@ -326,7 +338,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 		spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
 
-	cameraPos = spaceshipPos - 0.5 * spaceshipDir + glm::vec3(0, 1, 0) * 0.2f;
+	cameraPos = spaceshipPos - 0.5 * spaceshipDir + glm::vec3(0, 2, 0) * 0.2f;
 	cameraDir = spaceshipDir;
 
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
