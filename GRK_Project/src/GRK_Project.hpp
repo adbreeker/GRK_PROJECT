@@ -24,11 +24,14 @@ namespace models
 	// structures
 	Core::RenderContext roomContext;
 	Core::RenderContext roofContext;
+	Core::RenderContext ceilingContext;
 	Core::RenderContext floorContext;
+	Core::RenderContext sphereContext;
 
 	//furnitures
-	Core::RenderContext sphereContext;
-	Core::RenderContext windowContext;
+	Core::RenderContext hugeWindowContext;
+	Core::RenderContext smallWindow1Context;
+	Core::RenderContext smallWindow2Context;
 	Core::RenderContext bedContext;
 	Core::RenderContext chairContext;
 	Core::RenderContext deskContext;
@@ -37,6 +40,14 @@ namespace models
 	Core::RenderContext marbleBustContext;
 	Core::RenderContext materaceContext;
 	Core::RenderContext pencilsContext;
+
+	//player
+	Core::RenderContext fly0Context;
+	Core::RenderContext fly1Context;
+	Core::RenderContext fly2Context;
+	Core::RenderContext fly3Context;
+	Core::RenderContext fly4Context;
+	Core::RenderContext fly5Context;
 }
 
 GLuint depthMapFBO;
@@ -49,8 +60,6 @@ GLuint programTex;
 
 Core::Shader_Loader shaderLoader;
 
-Core::RenderContext shipContext;
-Core::RenderContext sphereContext;
 
 glm::vec3 sunDir = glm::vec3(-0.93633f, 0.351106, 0.003226f);
 glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f);
@@ -76,6 +85,8 @@ glm::vec3 spotlightConeDir = glm::vec3(0, 0, 0);
 glm::vec3 spotlightColor = glm::vec3(0.4, 0.4, 0.9)*3;
 float spotlightPhi = 3.14 / 4;
 
+int animationState = 0;
+bool animationStateRising = true;
 
 
 float lastTime = -1.f;
@@ -158,6 +169,94 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 
 }
 
+void animatePlayer()
+{
+	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
+	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
+	glm::mat4 specshipCameraRotrationMatrix = glm::mat4({
+		spaceshipSide.x,spaceshipSide.y,spaceshipSide.z,0,
+		spaceshipUp.x,spaceshipUp.y,spaceshipUp.z ,0,
+		-spaceshipDir.x,-spaceshipDir.y,-spaceshipDir.z,0,
+		0.,0.,0.,1.,
+		});
+
+
+	if (animationStateRising)
+	{
+		if (animationState < 5)
+		{
+			animationState++;
+		}
+		else
+		{
+			animationState--;
+			animationStateRising = false;
+		}
+	}
+	else
+	{
+		if (animationState > 0)
+		{
+			animationState--;
+		}
+		else
+		{
+			animationState++;
+			animationStateRising = true;
+		}
+	}
+
+	if (animationState == 0)
+	{
+		drawObjectPBR(models::fly0Context,
+			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::vec3(3, 3, 3),
+			0.2, 1.0
+		);
+	}
+	if (animationState == 1)
+	{
+		drawObjectPBR(models::fly1Context,
+			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::vec3(3, 3, 3),
+			0.2, 1.0
+		);
+	}
+	if (animationState == 2)
+	{
+		drawObjectPBR(models::fly2Context,
+			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::vec3(3, 3, 3),
+			0.2, 1.0
+		);
+	}
+	if (animationState == 3)
+	{
+		drawObjectPBR(models::fly3Context,
+			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::vec3(3, 3, 3),
+			0.2, 1.0
+		);
+	}
+	if (animationState == 4)
+	{
+		drawObjectPBR(models::fly4Context,
+			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::vec3(3, 3, 3),
+			0.2, 1.0
+		);
+	}
+	if (animationState == 5)
+	{
+		drawObjectPBR(models::fly5Context,
+			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::vec3(3, 3, 3),
+			0.2, 1.0
+		);
+	}
+	
+}
+
 void renderShadowapSun() {
 	float time = glfwGetTime();
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -197,7 +296,7 @@ void renderScene(GLFWwindow* window)
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x * 2.5f, sunColor.y * 2.5f, sunColor.z * 2.5f);
 	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
-	Core::DrawContext(sphereContext);
+	Core::DrawContext(models::sphereContext);
 
 	//ground
 	viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
@@ -205,7 +304,7 @@ void renderScene(GLFWwindow* window)
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniform3f(glGetUniformLocation(programSun, "color"), 0.1f,0.7f,0.1f);
 	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
-	Core::DrawContext(sphereContext);
+	Core::DrawContext(models::sphereContext);
 
 	glUseProgram(program);
 	
@@ -218,29 +317,22 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::materaceContext, glm::mat4(), glm::vec3(0.9f, 0.9f, 0.9f), 0.8f, 0.0f);
 	drawObjectPBR(models::pencilsContext, glm::mat4(), glm::vec3(0.10039f, 0.018356f, 0.001935f), 0.1f, 0.0f);
 	drawObjectPBR(models::roomContext, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), 0.8f, 0.0f);
+	drawObjectPBR(models::ceilingContext, glm::translate(glm::mat4(), glm::vec3(0,-0.01f,0)), glm::vec3(10.0f, 10.0f, 10.0f), 0.8f, 0.0f);
 	drawObjectPBR(models::roofContext, glm::mat4(), glm::vec3(40.0f, 0.0f, 0.0f), 0.8f, 0.0f);
 	drawObjectPBR(models::floorContext, glm::mat4(), glm::vec3(5,0,0), 1.0f, 1.0f);
-	drawObjectPBR(models::windowContext, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
+	drawObjectPBR(models::hugeWindowContext, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
+	drawObjectPBR(models::smallWindow1Context, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
+	drawObjectPBR(models::smallWindow2Context, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
 
-	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
-	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
-	glm::mat4 specshipCameraRotrationMatrix = glm::mat4({
-		spaceshipSide.x,spaceshipSide.y,spaceshipSide.z,0,
-		spaceshipUp.x,spaceshipUp.y,spaceshipUp.z ,0,
-		-spaceshipDir.x,-spaceshipDir.y,-spaceshipDir.z,0,
-		0.,0.,0.,1.,
-		});
+	
 
 
 	//drawObjectColor(shipContext,
 	//	glm::translate(cameraPos + 1.5 * cameraDir + cameraUp * -0.5f) * inveseCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()),
 	//	glm::vec3(0.3, 0.3, 0.5)
 	//	);
-	drawObjectPBR(shipContext,
-		glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
-		glm::vec3(0.3, 0.3, 0.5),
-		0.2,1.0
-	);
+	
+	animatePlayer();
 
 	spotlightPos = spaceshipPos + 0.2 * spaceshipDir;
 	spotlightConeDir = spaceshipDir;
@@ -286,23 +378,33 @@ void init(GLFWwindow* window)
 	programTest = shaderLoader.CreateProgram("shaders/test.vert", "shaders/test.frag");
 	programSun = shaderLoader.CreateProgram("shaders/shader_8_sun.vert", "shaders/shader_8_sun.frag");
 
-	loadModelToContext("./models/sphere.obj", sphereContext);
-	loadModelToContext("./models/fly.obj", shipContext);
+	//load structures
+	loadModelToContext("./models/structures/sphere.obj", models::sphereContext);
+	loadModelToContext("./models/structures/room.obj", models::roomContext);
+	loadModelToContext("./models/structures/roof.obj", models::roofContext);
+	loadModelToContext("./models/structures/ceiling.obj", models::ceilingContext);
+	loadModelToContext("./models/structures/floor.obj", models::floorContext);
 
+	//load furnitures
+	loadModelToContext("./models/furnitures/bed.obj", models::bedContext);
+	loadModelToContext("./models/furnitures/chair.obj", models::chairContext);
+	loadModelToContext("./models/furnitures/desk.obj", models::deskContext);
+	loadModelToContext("./models/furnitures/door.obj", models::doorContext);
+	loadModelToContext("./models/furnitures/drawer.obj", models::drawerContext);
+	loadModelToContext("./models/furnitures/marble_bust.obj", models::marbleBustContext);
+	loadModelToContext("./models/furnitures/materace.obj", models::materaceContext);
+	loadModelToContext("./models/furnitures/pencils.obj", models::pencilsContext);
+	loadModelToContext("./models/furnitures/huge_window.obj", models::hugeWindowContext);
+	loadModelToContext("./models/furnitures/small_window_1.obj", models::smallWindow1Context);
+	loadModelToContext("./models/furnitures/small_window_2.obj", models::smallWindow2Context);
 
-	loadModelToContext("./models/bed.obj", models::bedContext);
-	loadModelToContext("./models/chair.obj", models::chairContext);
-	loadModelToContext("./models/desk.obj", models::deskContext);
-	loadModelToContext("./models/door.obj", models::doorContext);
-	loadModelToContext("./models/drawer.obj", models::drawerContext);
-	loadModelToContext("./models/marbleBust.obj", models::marbleBustContext);
-	loadModelToContext("./models/materace.obj", models::materaceContext);
-	loadModelToContext("./models/pencils.obj", models::pencilsContext);
-	loadModelToContext("./models/room.obj", models::roomContext);
-	loadModelToContext("./models/roof.obj", models::roofContext);
-	loadModelToContext("./models/floor.obj", models::floorContext);
-	loadModelToContext("./models/sphere.obj", models::sphereContext);
-	loadModelToContext("./models/window.obj", models::windowContext);
+	//load player
+	loadModelToContext("./models/flyModels/fly0.obj", models::fly0Context);
+	loadModelToContext("./models/flyModels/fly1.obj", models::fly1Context);
+	loadModelToContext("./models/flyModels/fly2.obj", models::fly2Context);
+	loadModelToContext("./models/flyModels/fly3.obj", models::fly3Context);
+	loadModelToContext("./models/flyModels/fly4.obj", models::fly4Context);
+	loadModelToContext("./models/flyModels/fly5.obj", models::fly5Context);
 }
 
 
