@@ -1,24 +1,24 @@
-﻿#include "glew.h"
-#include <GLFW/glfw3.h>
-#include "glm.hpp"
-#include "ext.hpp"
+﻿#include <GLFW/glfw3.h>
 #include <iostream>
 #include <cmath>
-
-#include "Shader_Loader.h"
-#include "Render_Utils.h"
-//#include "Texture.h"
-
-#include "Box.cpp"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <string>
 
-const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+#include "glew.h"
+#include "glm.hpp"
+#include "ext.hpp"
+#include "Shader_Loader.h"
+#include "Render_Utils.h"
+#include "Texture.h"
+#include "Box.cpp"
 
+//window variables
+const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 int WIDTH = 800, HEIGHT = 800;
 
+//models ------------------------------------------------------------------------------------------------------------------------------------------------------------- models
 namespace models 
 {
 	// structures
@@ -50,6 +50,7 @@ namespace models
 	Core::RenderContext fly5Context;
 }
 
+//variables -------------------------------------------------------------------------------------------------------------------------------------------------------- variables
 GLuint depthMapFBO;
 GLuint depthMap;
 
@@ -60,38 +61,41 @@ GLuint programTex;
 
 Core::Shader_Loader shaderLoader;
 
-
+//sun
 glm::vec3 sunDir = glm::vec3(-0.93633f, 0.351106, 0.003226f);
 glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f);
 float sunForce = 5;
 
+//camera
 glm::vec3 cameraPos = glm::vec3(0.479490f, 1.250000f, -2.124680f);
 glm::vec3 cameraDir = glm::vec3(-0.354510f, 0.000000f, 0.935054f);
 
+//player
+glm::vec3 playerPos = glm::vec3(0, 1.250000f, -10);
+glm::vec3 playerDir = glm::vec3(-0.0f, 0.000000f, 1.0f);
 
-glm::vec3 spaceshipPos = glm::vec3(0, 1.250000f, -10);
-glm::vec3 spaceshipDir = glm::vec3(-0.0f, 0.000000f, 1.0f);
-GLuint VAO,VBO;
-
+//apsect and exposition
 float aspectRatio = 1.f;
-
 float exposition = 1.f;
 
+//pointlight (sun)
 glm::vec3 pointlightPos = glm::vec3(0, 15.0f, 0);
 glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6);
 
+//spotlight (player)
 glm::vec3 spotlightPos = glm::vec3(0, 0, 0);
 glm::vec3 spotlightConeDir = glm::vec3(0, 0, 0);
 glm::vec3 spotlightColor = glm::vec3(0.4, 0.4, 0.9)*3;
 float spotlightPhi = 3.14 / 4;
 
+//player animation
 int animationState = 0;
 bool animationStateRising = true;
 
 
+//delta time ------------------------------------------------------------------------------------------------------------------------------------------------------- delta time
 float lastTime = -1.f;
 float deltaTime = 0.f;
-
 void updateDeltaTime(float time) {
 	if (lastTime < 0) {
 		lastTime = time;
@@ -102,6 +106,9 @@ void updateDeltaTime(float time) {
 	if (deltaTime > 0.1) deltaTime = 0.1;
 	lastTime = time;
 }
+
+
+//camera and perspective matrix ------------------------------------------------------------------------------------------------------------------ camera and perspective matrix
 glm::mat4 createCameraMatrix()
 {
 	glm::vec3 cameraSide = glm::normalize(glm::cross(cameraDir,glm::vec3(0.f,1.f,0.f)));
@@ -139,8 +146,11 @@ glm::mat4 createPerspectiveMatrix()
 	return perspectiveMatrix;
 }
 
-void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, float roughness, float metallic) {
 
+
+//drawPBR ----------------------------------------------------------------------------------------------------------------------------------------------------------- drawPBR
+void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, float roughness, float metallic) 
+{
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -166,17 +176,19 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 	glUniform3f(glGetUniformLocation(program, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
 	glUniform1f(glGetUniformLocation(program, "spotlightPhi"), spotlightPhi);
 	Core::DrawContext(context);
-
 }
 
+
+
+//player animation ------------------------------------------------------------------------------------------------------------------------------------------- player animation
 void animatePlayer()
 {
-	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f, 1.f, 0.f)));
-	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceshipDir));
-	glm::mat4 specshipCameraRotrationMatrix = glm::mat4({
-		spaceshipSide.x,spaceshipSide.y,spaceshipSide.z,0,
-		spaceshipUp.x,spaceshipUp.y,spaceshipUp.z ,0,
-		-spaceshipDir.x,-spaceshipDir.y,-spaceshipDir.z,0,
+	glm::vec3 playerSide = glm::normalize(glm::cross(playerDir, glm::vec3(0.f, 1.f, 0.f)));
+	glm::vec3 playerUp = glm::normalize(glm::cross(playerSide, playerDir));
+	glm::mat4 playerCameraRotrationMatrix = glm::mat4({
+		playerSide.x,playerSide.y,playerSide.z,0,
+		playerUp.x,playerUp.y,playerUp.z ,0,
+		-playerDir.x,-playerDir.y,-playerDir.z,0,
 		0.,0.,0.,1.,
 		});
 
@@ -209,7 +221,7 @@ void animatePlayer()
 	if (animationState == 0)
 	{
 		drawObjectPBR(models::fly0Context,
-			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
 			glm::vec3(3, 3, 3),
 			0.2, 1.0
 		);
@@ -217,7 +229,7 @@ void animatePlayer()
 	if (animationState == 1)
 	{
 		drawObjectPBR(models::fly1Context,
-			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
 			glm::vec3(3, 3, 3),
 			0.2, 1.0
 		);
@@ -225,7 +237,7 @@ void animatePlayer()
 	if (animationState == 2)
 	{
 		drawObjectPBR(models::fly2Context,
-			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
 			glm::vec3(3, 3, 3),
 			0.2, 1.0
 		);
@@ -233,7 +245,7 @@ void animatePlayer()
 	if (animationState == 3)
 	{
 		drawObjectPBR(models::fly3Context,
-			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
 			glm::vec3(3, 3, 3),
 			0.2, 1.0
 		);
@@ -241,7 +253,7 @@ void animatePlayer()
 	if (animationState == 4)
 	{
 		drawObjectPBR(models::fly4Context,
-			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
 			glm::vec3(3, 3, 3),
 			0.2, 1.0
 		);
@@ -249,7 +261,7 @@ void animatePlayer()
 	if (animationState == 5)
 	{
 		drawObjectPBR(models::fly5Context,
-			glm::translate(spaceshipPos) * specshipCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
 			glm::vec3(3, 3, 3),
 			0.2, 1.0
 		);
@@ -257,57 +269,103 @@ void animatePlayer()
 	
 }
 
-void renderShadowapSun() {
+
+//render shadow ----------------------------------------------------------------------------------------------------------------------------------------------- render shadow
+void renderShadowapSun()
+{
 	float time = glfwGetTime();
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	//uzupelnij o renderowanie glebokosci do tekstury
-
-
-
-
-
+	// 
+	//		/\
+	//		||
+	// 
+	//coś z ostatnich zajęć, przy odrobinie szczęścia ktoś to ogarnie zanim zauważy to prowadzący xd
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, WIDTH, HEIGHT);
 }
 
-void renderScene(GLFWwindow* window)
-{
-	glClearColor(0.4f, 0.4f, 0.8f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	float time = glfwGetTime();
-	updateDeltaTime(time);
-	renderShadowapSun();
 
-	//sun
+//render scene objects ----------------------------------------------------------------------------------------------------------------------------------- render scene objects
+void renderSun()
+{
 	glUseProgram(programSun);
-	pointlightPos = glm::vec3(glm::eulerAngleZ(0.01f) * glm::vec4(pointlightPos, 0));
-	sunDir = -pointlightPos;
-	if (pointlightPos.y < 0)
+
+	float sunSpeedFast = 0.01f;
+	float sunSpeedSlow = 0.001f;
+	float sunSpeed;
+
+	if (pointlightPos.y < -3.5f)
 	{
 		sunForce = 0;
+		sunSpeed = sunSpeedFast;
 	}
 	else
 	{
-		sunForce = pointlightPos.y/3;
+		sunSpeed = sunSpeedSlow;
+		if (pointlightPos.y <= 1.5f)
+		{
+			sunForce = 0.5f;
+		}
+		else
+		{
+			sunForce = pointlightPos.y / 3;
+		}
 	}
+
+	pointlightPos = glm::vec3(glm::eulerAngleZ(sunSpeed) * glm::vec4(pointlightPos, 0));
+	sunDir = -pointlightPos;
+
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * glm::translate(pointlightPos) * glm::scale(glm::vec3(0.7));
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x * 2.5f, sunColor.y * 2.5f, sunColor.z * 2.5f);
 	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
 	Core::DrawContext(models::sphereContext);
+}
 
-	//ground
-	viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
-	transformation = viewProjectionMatrix * glm::translate(glm::vec3(0,-9868.55f,0)) * glm::scale(glm::vec3(10000));
+void renderGround()
+{
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * glm::translate(glm::vec3(0, -9868.55f, 0)) * glm::scale(glm::vec3(10000));
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniform3f(glGetUniformLocation(programSun, "color"), 0.1f,0.7f,0.1f);
+	glUniform3f(glGetUniformLocation(programSun, "color"), 0.1f, 0.7f, 0.1f);
 	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
 	Core::DrawContext(models::sphereContext);
+}
+
+
+//render scene --------------------------------------------------------------------------------- render scene
+void renderScene(GLFWwindow* window)
+{
+	//skybox
+	glClearColor(0.4f, 0.4f, 0.8f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//time and delta time
+	float time = glfwGetTime();
+	updateDeltaTime(time);
+
+	//shadow
+	renderShadowapSun();
+
+	//sun
+	renderSun();
+
+	//ground
+	renderGround();
+	
 
 	glUseProgram(program);
 	
+	//render structures
+	drawObjectPBR(models::ceilingContext, glm::translate(glm::mat4(), glm::vec3(0, -0.01f, 0)), glm::vec3(10.0f, 10.0f, 10.0f), 0.8f, 0.0f);
+	drawObjectPBR(models::roofContext, glm::mat4(), glm::vec3(40.0f, 0.0f, 0.0f), 0.8f, 0.0f);
+	drawObjectPBR(models::floorContext, glm::mat4(), glm::vec3(5, 0, 0), 1.0f, 1.0f);
+	drawObjectPBR(models::roomContext, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), 0.8f, 0.0f);
+
+	//render furnitures
 	drawObjectPBR(models::bedContext, glm::mat4(), glm::vec3(0.03f, 0.03f, 0.03f), 0.2f, 0.0f);
 	drawObjectPBR(models::chairContext, glm::mat4(), glm::vec3(0.195239f, 0.37728f, 0.8f), 0.4f, 0.0f);
 	drawObjectPBR(models::deskContext, glm::mat4(), glm::vec3(0.428691f, 0.08022f, 0.036889f), 0.2f, 0.0f);
@@ -316,39 +374,24 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::marbleBustContext, glm::mat4(), glm::vec3(1.f, 1.f, 1.f), 0.5f, 1.0f);
 	drawObjectPBR(models::materaceContext, glm::mat4(), glm::vec3(0.9f, 0.9f, 0.9f), 0.8f, 0.0f);
 	drawObjectPBR(models::pencilsContext, glm::mat4(), glm::vec3(0.10039f, 0.018356f, 0.001935f), 0.1f, 0.0f);
-	drawObjectPBR(models::roomContext, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), 0.8f, 0.0f);
-	drawObjectPBR(models::ceilingContext, glm::translate(glm::mat4(), glm::vec3(0,-0.01f,0)), glm::vec3(10.0f, 10.0f, 10.0f), 0.8f, 0.0f);
-	drawObjectPBR(models::roofContext, glm::mat4(), glm::vec3(40.0f, 0.0f, 0.0f), 0.8f, 0.0f);
-	drawObjectPBR(models::floorContext, glm::mat4(), glm::vec3(5,0,0), 1.0f, 1.0f);
 	drawObjectPBR(models::hugeWindowContext, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
 	drawObjectPBR(models::smallWindow1Context, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
 	drawObjectPBR(models::smallWindow2Context, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
 
-	
-
-
-	//drawObjectColor(shipContext,
-	//	glm::translate(cameraPos + 1.5 * cameraDir + cameraUp * -0.5f) * inveseCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()),
-	//	glm::vec3(0.3, 0.3, 0.5)
-	//	);
-	
+	//render and animate player
 	animatePlayer();
 
-	spotlightPos = spaceshipPos + 0.2 * spaceshipDir;
-	spotlightConeDir = spaceshipDir;
-
-
-
-	//test depth buffer
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glUseProgram(programTest);
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, depthMap);
-	//Core::DrawContext(models::testContext);
+	//update player light cone
+	spotlightPos = playerPos + 0.2 * playerDir;
+	spotlightConeDir = playerDir;
 
 	glUseProgram(0);
 	glfwSwapBuffers(window);
 }
+
+
+
+// initialization ---------------------------------------------------------------------------------------------------------------------------------------------- initialization
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	aspectRatio = width / float(height);
@@ -356,6 +399,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	WIDTH = width;
 	HEIGHT = height;
 }
+
+
 void loadModelToContext(std::string path, Core::RenderContext& context)
 {
 	Assimp::Importer import;
@@ -369,6 +414,7 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 	context.initFromAssimpMesh(scene->mMeshes[0]);
 }
 
+// init ------------------------------------------------------------------------------------------------------- init
 void init(GLFWwindow* window)
 {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -408,56 +454,83 @@ void init(GLFWwindow* window)
 }
 
 
+//shutdown ---------------------------------------------------------------------------------------------------------------------------------------------------------- shutdown
 void shutdown(GLFWwindow* window)
 {
 	shaderLoader.DeleteProgram(program);
 }
 
-//obsluga wejscia
+
+
+//input processing ------------------------------------------------------------------------------------------------------------------------------------------- input processing
 void processInput(GLFWwindow* window)
 {
-	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceshipDir, glm::vec3(0.f,1.f,0.f)));
+	glm::vec3 spaceshipSide = glm::normalize(glm::cross(playerDir, glm::vec3(0.f,1.f,0.f)));
 	glm::vec3 spaceshipUp = glm::vec3(0.f, 1.f, 0.f);
 	float angleSpeed = 0.05f * deltaTime * 60;
 	float moveSpeed = 0.05f * deltaTime * 60;
+
+
+	//exit
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		spaceshipPos += spaceshipDir * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		spaceshipPos -= spaceshipDir * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		spaceshipPos += spaceshipSide * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		spaceshipPos -= spaceshipSide * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		spaceshipPos += spaceshipUp * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		spaceshipPos -= spaceshipUp * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		spaceshipDir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceshipDir, 0));
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		spaceshipDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceshipDir, 0));
 
-	cameraPos = spaceshipPos - 0.5 * spaceshipDir + glm::vec3(0, 2, 0) * 0.2f;
-	cameraDir = spaceshipDir;
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		exposition -= 0.05;
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		exposition += 0.05;
-
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
-		printf("spaceshipPos = glm::vec3(%ff, %ff, %ff);\n", spaceshipPos.x, spaceshipPos.y, spaceshipPos.z);
-		printf("spaceshipDir = glm::vec3(%ff, %ff, %ff);\n", spaceshipDir.x, spaceshipDir.y, spaceshipDir.z);
+	//motion
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		playerPos += playerDir * moveSpeed;
+	}	
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		playerPos -= playerDir * moveSpeed;
 	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		playerPos += spaceshipSide * moveSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		playerPos -= spaceshipSide * moveSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		playerPos += spaceshipUp * moveSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		playerPos -= spaceshipUp * moveSpeed;
+	}
+	
 
-	//cameraDir = glm::normalize(-cameraPos);
+	//rotation
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		playerDir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(playerDir, 0));
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		playerDir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(playerDir, 0));
+	}
+		
 
+	//update camera
+	cameraPos = playerPos - 0.5 * playerDir + glm::vec3(0, 2, 0) * 0.2f;
+	cameraDir = playerDir;
+
+
+	//exposition
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+		exposition -= 0.05;
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+		exposition += 0.05;
+	}
+		
+
+	// debug info
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+		printf("spaceshipPos = glm::vec3(%ff, %ff, %ff);\n", playerPos.x, playerPos.y, playerPos.z);
+		printf("spaceshipDir = glm::vec3(%ff, %ff, %ff);\n", playerDir.x, playerDir.y, playerDir.z);
+	}
 }
 
-// funkcja jest glowna petla
+
+
+//main loop -------------------------------------------------------------------------------------------------------------------------------------------------------- main loop
 void renderLoop(GLFWwindow* window) {
 	while (!glfwWindowShouldClose(window))
 	{
@@ -467,4 +540,3 @@ void renderLoop(GLFWwindow* window) {
 		glfwPollEvents();
 	}
 }
-//}

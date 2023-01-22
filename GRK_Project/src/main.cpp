@@ -5,9 +5,7 @@
 #include "ext.hpp"
 #include <iostream>
 #include <cmath>
-
 #include "GRK_Project.hpp"
-
 
 
 int main(int argc, char** argv)
