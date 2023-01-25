@@ -9,15 +9,15 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Shader Files">
       <UniqueIdentifier>{0a247bb8-2e8e-4a90-b0ef-17415b0941ba}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\SOIL">
       <UniqueIdentifier>{0af44075-33f4-4953-b1d6-1d28d61d758f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +107,12 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="shaders\test.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shader_skybox.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shader_skybox.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

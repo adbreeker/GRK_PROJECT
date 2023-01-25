@@ -43,6 +43,8 @@
     <None Include="shaders\shader_8_sun.vert" />
     <None Include="shaders\test.frag" />
     <None Include="shaders\test.vert" />
+    <None Include="shader_skybox.frag" />
+    <None Include="shader_skybox.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AF809A56-B3DF-4CB4-868B-A19CC5EDB9F7}</ProjectGuid>
@@ -56,7 +58,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
