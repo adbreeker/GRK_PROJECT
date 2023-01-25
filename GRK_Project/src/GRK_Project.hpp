@@ -13,6 +13,7 @@
 #include "Render_Utils.h"
 #include "Texture.h"
 #include "Box.cpp"
+#include "SOIL/SOIL.h"
 
 //window variables
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
@@ -48,6 +49,13 @@ namespace models
 	Core::RenderContext fly3Context;
 	Core::RenderContext fly4Context;
 	Core::RenderContext fly5Context;
+
+	//skybox
+	Core::RenderContext skyboxContext;
+}
+
+namespace texture {
+	GLuint skybox;
 }
 
 //variables -------------------------------------------------------------------------------------------------------------------------------------------------------- variables
@@ -58,8 +66,10 @@ GLuint program;
 GLuint programSun;
 GLuint programTest;
 GLuint programTex;
+GLuint programSkybox;
 
 Core::Shader_Loader shaderLoader;
+
 
 //sun
 glm::vec3 sunDir = glm::vec3(-0.93633f, 0.351106, 0.003226f);
@@ -71,7 +81,7 @@ glm::vec3 cameraPos = glm::vec3(0.479490f, 1.250000f, -2.124680f);
 glm::vec3 cameraDir = glm::vec3(-0.354510f, 0.000000f, 0.935054f);
 
 //player
-glm::vec3 playerPos = glm::vec3(0, 1.250000f, -10);
+glm::vec3 playerPos = glm::vec3(0, 1.250000f, 0);
 glm::vec3 playerDir = glm::vec3(-0.0f, 0.000000f, 1.0f);
 
 //apsect and exposition
@@ -335,13 +345,25 @@ void renderGround()
 	Core::DrawContext(models::sphereContext);
 }
 
+void renderSkybox(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID)
+{
+	glDepthFunc(GL_LEQUAL);
+	glUseProgram(programSkybox);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	Core::SetActiveTexture(textureID, "skybox", programSkybox, 0);
+	Core::DrawContext(context);
+	glDepthFunc(GL_LESS);
+}
 
 //render scene --------------------------------------------------------------------------------- render scene
 void renderScene(GLFWwindow* window)
 {
 	//skybox
-	glClearColor(0.4f, 0.4f, 0.8f, 1.0f);
+	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	renderSkybox(models::skyboxContext, glm::mat4(), texture::skybox);
 
 	//time and delta time
 	float time = glfwGetTime();
@@ -414,6 +436,41 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 	context.initFromAssimpMesh(scene->mMeshes[0]);
 }
 
+void loadSkyboxTextures() {
+	int w, h;
+
+	glGenTextures(1, &texture::skybox);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture::skybox);
+
+	const char* filepaths[6] = {
+		"textures/skybox/px.png",
+		"textures/skybox/nx.png",
+		"textures/skybox/py.png",
+		"textures/skybox/ny.png",
+		"textures/skybox/pz.png",
+		"textures/skybox/nz.png"
+	};
+	for (unsigned int i = 0; i < 6; i++)
+	{
+		unsigned char* image = SOIL_load_image(filepaths[i], &w, &h, 0, SOIL_LOAD_RGBA);
+		if (image) {
+			glTexImage2D(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image
+			);
+		}
+		else {
+			std::cout << "Failed to load texture: " << filepaths[i] << std::endl;
+		}
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+}
+
 // init ------------------------------------------------------------------------------------------------------- init
 void init(GLFWwindow* window)
 {
@@ -423,6 +480,7 @@ void init(GLFWwindow* window)
 	program = shaderLoader.CreateProgram("shaders/shader_9_1.vert", "shaders/shader_9_1.frag");
 	programTest = shaderLoader.CreateProgram("shaders/test.vert", "shaders/test.frag");
 	programSun = shaderLoader.CreateProgram("shaders/shader_8_sun.vert", "shaders/shader_8_sun.frag");
+	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 
 	//load structures
 	loadModelToContext("./models/structures/sphere.obj", models::sphereContext);
@@ -451,6 +509,10 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/flyModels/fly3.obj", models::fly3Context);
 	loadModelToContext("./models/flyModels/fly4.obj", models::fly4Context);
 	loadModelToContext("./models/flyModels/fly5.obj", models::fly5Context);
+
+	//load skybox and it's textures
+	loadModelToContext("./models/skybox/cube.obj", models::skyboxContext);
+	loadSkyboxTextures();
 }
 
 
