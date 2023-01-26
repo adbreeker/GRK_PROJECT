@@ -63,7 +63,7 @@ namespace textures
 	GLuint ground;
 
 	//furnitures
-
+	GLuint painting;
 
 	//player
 }
@@ -72,10 +72,9 @@ namespace textures
 GLuint depthMapFBO;
 GLuint depthMap;
 
-GLuint program;
-GLuint programSun;
-GLuint programTest;
+GLuint programPBR;
 GLuint programTex;
+GLuint programSun;
 GLuint programSkybox;
 
 Core::Shader_Loader shaderLoader;
@@ -99,7 +98,8 @@ float aspectRatio = 1.f;
 float exposition = 1.f;
 
 //pointlight (sun)
-glm::vec3 pointlightPos = glm::vec3(0, 100.0f, 0);
+glm::vec3 basePointlightPos = glm::vec3(0, 100.0f, 0);
+glm::vec3 pointlightPos = basePointlightPos;
 glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6);
 float sunPositionTranslateModifier = -85.0f;
 
@@ -172,30 +172,63 @@ glm::mat4 createPerspectiveMatrix()
 //drawPBR ----------------------------------------------------------------------------------------------------------------------------------------------------------- drawPBR
 void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, float roughness, float metallic) 
 {
+	glUseProgram(programPBR);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniformMatrix4fv(glGetUniformLocation(programPBR, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programPBR, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 
-	glUniform1f(glGetUniformLocation(program, "exposition"), exposition);
+	glUniform1f(glGetUniformLocation(programPBR, "exposition"), exposition);
 
-	glUniform1f(glGetUniformLocation(program, "roughness"), roughness);
-	glUniform1f(glGetUniformLocation(program, "metallic"), metallic);
+	glUniform1f(glGetUniformLocation(programPBR, "roughness"), roughness);
+	glUniform1f(glGetUniformLocation(programPBR, "metallic"), metallic);
 
-	glUniform3f(glGetUniformLocation(program, "color"), color.x, color.y, color.z);
+	glUniform3f(glGetUniformLocation(programPBR, "color"), color.x, color.y, color.z);
 
-	glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+	glUniform3f(glGetUniformLocation(programPBR, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 
-	glUniform3f(glGetUniformLocation(program, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
-	glUniform3f(glGetUniformLocation(program, "sunColor"), sunColor.x * sunForce/100, sunColor.y * sunForce/100, sunColor.z * sunForce/100);
+	glUniform3f(glGetUniformLocation(programPBR, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
+	glUniform3f(glGetUniformLocation(programPBR, "sunColor"), sunColor.x * sunForce/100, sunColor.y * sunForce/100, sunColor.z * sunForce/100);
 
-	glUniform3f(glGetUniformLocation(program, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
-	glUniform3f(glGetUniformLocation(program, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
+	glUniform3f(glGetUniformLocation(programPBR, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
+	glUniform3f(glGetUniformLocation(programPBR, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
 
-	glUniform3f(glGetUniformLocation(program, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
-	glUniform3f(glGetUniformLocation(program, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
-	glUniform3f(glGetUniformLocation(program, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
-	glUniform1f(glGetUniformLocation(program, "spotlightPhi"), spotlightPhi);
+	glUniform3f(glGetUniformLocation(programPBR, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
+	glUniform3f(glGetUniformLocation(programPBR, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
+	glUniform3f(glGetUniformLocation(programPBR, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
+	glUniform1f(glGetUniformLocation(programPBR, "spotlightPhi"), spotlightPhi);
+	Core::DrawContext(context);
+}
+
+// drawPBR with texture
+void drawObjectPBRTex(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureId, float roughness, float metallic, float brightness)
+{
+	glUseProgram(programTex);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(programTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+
+	glUniform1f(glGetUniformLocation(programTex, "exposition"), exposition);
+
+	glUniform1f(glGetUniformLocation(programTex, "roughness"), roughness);
+	glUniform1f(glGetUniformLocation(programTex, "metallic"), metallic);
+	glUniform1f(glGetUniformLocation(programTex, "brightness"), brightness);
+
+
+	glUniform3f(glGetUniformLocation(programTex, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+
+	glUniform3f(glGetUniformLocation(programTex, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
+	glUniform3f(glGetUniformLocation(programTex, "sunColor"), sunColor.x * sunForce / 100, sunColor.y * sunForce / 100, sunColor.z * sunForce / 100);
+
+	glUniform3f(glGetUniformLocation(programTex, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
+	glUniform3f(glGetUniformLocation(programTex, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
+
+	glUniform3f(glGetUniformLocation(programTex, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
+	glUniform3f(glGetUniformLocation(programTex, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
+	glUniform3f(glGetUniformLocation(programTex, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
+	glUniform1f(glGetUniformLocation(programTex, "spotlightPhi"), spotlightPhi);
+	Core::SetActiveTexture(textureId, "colorTexture", programTex, 0);
 	Core::DrawContext(context);
 }
 
@@ -309,35 +342,11 @@ void renderShadowapSun()
 
 
 //render scene objects ----------------------------------------------------------------------------------------------------------------------------------- render scene objects
-void renderSun()
+void renderSun(float rotation)
 {
 	glUseProgram(programSun);
 
-	float sunSpeedFast = 0.1f;
-	float sunSpeedSlow = 0.001f;
-	float sunSpeed;
-
-	
-
-	if (pointlightPos.y + sunPositionTranslateModifier < 4.0f)
-	{
-		sunSpeed = sunSpeedFast;
-	}
-	else
-	{
-		sunSpeed = sunSpeedSlow;
-	}
-
-	if (pointlightPos.y + sunPositionTranslateModifier <= 1.5f)
-	{
-		sunForce = 0.5f;
-	}
-	else
-	{
-		sunForce = (pointlightPos.y + sunPositionTranslateModifier) / 3;
-	}
-
-	pointlightPos = glm::vec3(glm::eulerAngleZ(sunSpeed) * glm::vec4(pointlightPos, 0));
+	glm::vec3 pointlightPos = glm::vec3(glm::eulerAngleZ((rotation * 3.142)/180) * glm::vec4(basePointlightPos, 0));
 	sunDir = pointlightPos;
 
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
@@ -376,17 +385,15 @@ void renderScene(GLFWwindow* window)
 	renderShadowapSun();
 
 	//sun
-	renderSun();
+	renderSun(13);
 	
-
-	glUseProgram(program);
 	
 	//render structures
 	drawObjectPBR(models::ceilingContext, glm::translate(glm::mat4(), glm::vec3(0.0f, -0.01f, 0.0f)), glm::vec3(10.0f, 10.0f, 10.0f), 0.8f, 0.0f);
 	drawObjectPBR(models::roofContext, glm::mat4(), glm::vec3(40.0f, 0.0f, 0.0f), 0.8f, 0.0f);
 	drawObjectPBR(models::floorContext, glm::mat4(), glm::vec3(5.0f, 0.0f, 0.0f), 1.0f, 1.0f);
 	drawObjectPBR(models::roomContext, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), 0.8f, 0.0f);
-	drawObjectPBR(models::groundContext, glm::mat4(), glm::vec3(2.0f, 3.5f, 2.0f), 1.0f, 1.0f);
+	drawObjectPBRTex(models::groundContext, glm::mat4(), textures::ground, 1.0f, 1.0f, 30.0f);
 
 	//render furnitures
 	drawObjectPBR(models::bedContext, glm::mat4(), glm::vec3(0.03f, 0.03f, 0.03f), 0.2f, 0.0f);
@@ -400,7 +407,7 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::hugeWindowContext, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
 	drawObjectPBR(models::smallWindow1Context, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
 	drawObjectPBR(models::smallWindow2Context, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
-	drawObjectPBR(models::painting, glm::mat4(), glm::vec3(10.0f, 10.0f, 10.0f), 0.0f, 0.0f);
+	drawObjectPBRTex(models::painting, glm::mat4(), textures::painting, 0.0f, 0.0f, 3.0f);
 
 	//render and animate player
 	animatePlayer();
@@ -409,7 +416,6 @@ void renderScene(GLFWwindow* window)
 	spotlightPos = playerPos + 0.2 * playerDir;
 	spotlightConeDir = playerDir;
 
-	glUseProgram(0);
 	glfwSwapBuffers(window);
 }
 
@@ -479,10 +485,12 @@ void init(GLFWwindow* window)
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	glEnable(GL_DEPTH_TEST);
-	program = shaderLoader.CreateProgram("shaders/shader_9_1.vert", "shaders/shader_9_1.frag");
-	programTest = shaderLoader.CreateProgram("shaders/test.vert", "shaders/test.frag");
-	programSun = shaderLoader.CreateProgram("shaders/shader_8_sun.vert", "shaders/shader_8_sun.frag");
+	programPBR = shaderLoader.CreateProgram("shaders/shader_pbr.vert", "shaders/shader_pbr.frag");
+	programTex = shaderLoader.CreateProgram("shaders/shader_pbr_tex.vert", "shaders/shader_pbr_tex.frag");
+	programSun = shaderLoader.CreateProgram("shaders/shader_sun.vert", "shaders/shader_sun.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
+	
+	
 
 	//load structures
 	loadModelToContext("./models/structures/sphere.obj", models::sphereContext);
@@ -517,13 +525,20 @@ void init(GLFWwindow* window)
 	//load skybox and it's textures
 	loadModelToContext("./models/skybox/cube.obj", models::skyboxContext);
 	loadSkyboxTextures();
+
+	//load textures
+	textures::painting = Core::LoadTexture("./models/furnitures/painting/Texture.png");
+	textures::ground = Core::LoadTexture("./models/structures/ground/texture.png");
 }
 
 
 //shutdown ---------------------------------------------------------------------------------------------------------------------------------------------------------- shutdown
 void shutdown(GLFWwindow* window)
 {
-	shaderLoader.DeleteProgram(program);
+	shaderLoader.DeleteProgram(programPBR);
+	shaderLoader.DeleteProgram(programTex);
+	shaderLoader.DeleteProgram(programSun);
+	shaderLoader.DeleteProgram(programSkybox);
 }
 
 
