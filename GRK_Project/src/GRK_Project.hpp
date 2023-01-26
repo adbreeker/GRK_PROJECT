@@ -28,6 +28,8 @@ namespace models
 	Core::RenderContext ceilingContext;
 	Core::RenderContext floorContext;
 	Core::RenderContext sphereContext;
+	Core::RenderContext groundContext;
+	Core::RenderContext skyboxContext;
 
 	//furnitures
 	Core::RenderContext hugeWindowContext;
@@ -41,6 +43,8 @@ namespace models
 	Core::RenderContext marbleBustContext;
 	Core::RenderContext materaceContext;
 	Core::RenderContext pencilsContext;
+	Core::RenderContext painting;
+
 
 	//player
 	Core::RenderContext fly0Context;
@@ -50,12 +54,18 @@ namespace models
 	Core::RenderContext fly4Context;
 	Core::RenderContext fly5Context;
 
-	//skybox
-	Core::RenderContext skyboxContext;
 }
 
-namespace texture {
+namespace textures 
+{
+	//structures
 	GLuint skybox;
+	GLuint ground;
+
+	//furnitures
+
+
+	//player
 }
 
 //variables -------------------------------------------------------------------------------------------------------------------------------------------------------- variables
@@ -89,8 +99,9 @@ float aspectRatio = 1.f;
 float exposition = 1.f;
 
 //pointlight (sun)
-glm::vec3 pointlightPos = glm::vec3(0, 15.0f, 0);
+glm::vec3 pointlightPos = glm::vec3(0, 100.0f, 0);
 glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6);
+float sunPositionTranslateModifier = -85.0f;
 
 //spotlight (player)
 glm::vec3 spotlightPos = glm::vec3(0, 0, 0);
@@ -176,7 +187,7 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 	glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 
 	glUniform3f(glGetUniformLocation(program, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
-	glUniform3f(glGetUniformLocation(program, "sunColor"), sunColor.x * sunForce, sunColor.y * sunForce, sunColor.z * sunForce);
+	glUniform3f(glGetUniformLocation(program, "sunColor"), sunColor.x * sunForce/100, sunColor.y * sunForce/100, sunColor.z * sunForce/100);
 
 	glUniform3f(glGetUniformLocation(program, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
 	glUniform3f(glGetUniformLocation(program, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
@@ -302,45 +313,37 @@ void renderSun()
 {
 	glUseProgram(programSun);
 
-	float sunSpeedFast = 0.01f;
+	float sunSpeedFast = 0.1f;
 	float sunSpeedSlow = 0.001f;
 	float sunSpeed;
 
-	if (pointlightPos.y < -3.5f)
+	
+
+	if (pointlightPos.y + sunPositionTranslateModifier < 4.0f)
 	{
-		sunForce = 0;
 		sunSpeed = sunSpeedFast;
 	}
 	else
 	{
 		sunSpeed = sunSpeedSlow;
-		if (pointlightPos.y <= 1.5f)
-		{
-			sunForce = 0.5f;
-		}
-		else
-		{
-			sunForce = pointlightPos.y / 3;
-		}
+	}
+
+	if (pointlightPos.y + sunPositionTranslateModifier <= 1.5f)
+	{
+		sunForce = 0.5f;
+	}
+	else
+	{
+		sunForce = (pointlightPos.y + sunPositionTranslateModifier) / 3;
 	}
 
 	pointlightPos = glm::vec3(glm::eulerAngleZ(sunSpeed) * glm::vec4(pointlightPos, 0));
-	sunDir = -pointlightPos;
+	sunDir = pointlightPos;
 
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
-	glm::mat4 transformation = viewProjectionMatrix * glm::translate(pointlightPos) * glm::scale(glm::vec3(0.7));
+	glm::mat4 transformation = viewProjectionMatrix * glm::translate(pointlightPos + glm::vec3(0.0f,sunPositionTranslateModifier,0.0f)) * glm::scale(glm::vec3(1.0f));
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x * 2.5f, sunColor.y * 2.5f, sunColor.z * 2.5f);
-	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
-	Core::DrawContext(models::sphereContext);
-}
-
-void renderGround()
-{
-	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
-	glm::mat4 transformation = viewProjectionMatrix * glm::translate(glm::vec3(0, -9868.55f, 0)) * glm::scale(glm::vec3(10000));
-	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniform3f(glGetUniformLocation(programSun, "color"), 0.1f, 0.7f, 0.1f);
 	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
 	Core::DrawContext(models::sphereContext);
 }
@@ -363,7 +366,7 @@ void renderScene(GLFWwindow* window)
 	//skybox
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderSkybox(models::skyboxContext, glm::mat4(), texture::skybox);
+	renderSkybox(models::skyboxContext, glm::translate(glm::scale(glm::mat4(), glm::vec3(4.0f)), glm::vec3(0.0f,2.0f,0.0f)), textures::skybox);
 
 	//time and delta time
 	float time = glfwGetTime();
@@ -374,31 +377,30 @@ void renderScene(GLFWwindow* window)
 
 	//sun
 	renderSun();
-
-	//ground
-	renderGround();
 	
 
 	glUseProgram(program);
 	
 	//render structures
-	drawObjectPBR(models::ceilingContext, glm::translate(glm::mat4(), glm::vec3(0, -0.01f, 0)), glm::vec3(10.0f, 10.0f, 10.0f), 0.8f, 0.0f);
+	drawObjectPBR(models::ceilingContext, glm::translate(glm::mat4(), glm::vec3(0.0f, -0.01f, 0.0f)), glm::vec3(10.0f, 10.0f, 10.0f), 0.8f, 0.0f);
 	drawObjectPBR(models::roofContext, glm::mat4(), glm::vec3(40.0f, 0.0f, 0.0f), 0.8f, 0.0f);
-	drawObjectPBR(models::floorContext, glm::mat4(), glm::vec3(5, 0, 0), 1.0f, 1.0f);
+	drawObjectPBR(models::floorContext, glm::mat4(), glm::vec3(5.0f, 0.0f, 0.0f), 1.0f, 1.0f);
 	drawObjectPBR(models::roomContext, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), 0.8f, 0.0f);
+	drawObjectPBR(models::groundContext, glm::mat4(), glm::vec3(2.0f, 3.5f, 2.0f), 1.0f, 1.0f);
 
 	//render furnitures
 	drawObjectPBR(models::bedContext, glm::mat4(), glm::vec3(0.03f, 0.03f, 0.03f), 0.2f, 0.0f);
-	drawObjectPBR(models::chairContext, glm::mat4(), glm::vec3(0.195239f, 0.37728f, 0.8f), 0.4f, 0.0f);
-	drawObjectPBR(models::deskContext, glm::mat4(), glm::vec3(0.428691f, 0.08022f, 0.036889f), 0.2f, 0.0f);
-	drawObjectPBR(models::doorContext, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
-	drawObjectPBR(models::drawerContext, glm::mat4(), glm::vec3(0.428691f, 0.08022f, 0.036889f), 0.2f, 0.0f);
-	drawObjectPBR(models::marbleBustContext, glm::mat4(), glm::vec3(1.f, 1.f, 1.f), 0.5f, 1.0f);
+	drawObjectPBR(models::chairContext, glm::mat4(), glm::vec3(0.2f, 0.4f, 0.8f), 0.4f, 0.0f);
+	drawObjectPBR(models::deskContext, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.0f), 0.2f, 0.0f);
+	drawObjectPBR(models::doorContext, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
+	drawObjectPBR(models::drawerContext, glm::mat4(), glm::vec3(0.4f, 0.08f, 0.03f), 0.2f, 0.0f);
+	drawObjectPBR(models::marbleBustContext, glm::mat4(), glm::vec3(1.0f, 1.0f, 1.0f), 0.5f, 1.0f);
 	drawObjectPBR(models::materaceContext, glm::mat4(), glm::vec3(0.9f, 0.9f, 0.9f), 0.8f, 0.0f);
-	drawObjectPBR(models::pencilsContext, glm::mat4(), glm::vec3(0.10039f, 0.018356f, 0.001935f), 0.1f, 0.0f);
-	drawObjectPBR(models::hugeWindowContext, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
-	drawObjectPBR(models::smallWindow1Context, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
-	drawObjectPBR(models::smallWindow2Context, glm::mat4(), glm::vec3(0.402978f, 0.120509f, 0.057729f), 0.2f, 0.0f);
+	drawObjectPBR(models::pencilsContext, glm::mat4(), glm::vec3(0.1f, 0.02f, 0.0f), 0.1f, 0.0f);
+	drawObjectPBR(models::hugeWindowContext, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
+	drawObjectPBR(models::smallWindow1Context, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
+	drawObjectPBR(models::smallWindow2Context, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
+	drawObjectPBR(models::painting, glm::mat4(), glm::vec3(10.0f, 10.0f, 10.0f), 0.0f, 0.0f);
 
 	//render and animate player
 	animatePlayer();
@@ -439,16 +441,16 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 void loadSkyboxTextures() {
 	int w, h;
 
-	glGenTextures(1, &texture::skybox);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texture::skybox);
+	glGenTextures(1, &textures::skybox);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textures::skybox);
 
 	const char* filepaths[6] = {
-		"textures/skybox/px.png",
-		"textures/skybox/nx.png",
-		"textures/skybox/py.png",
-		"textures/skybox/ny.png",
-		"textures/skybox/pz.png",
-		"textures/skybox/nz.png"
+		"models/skybox/textures/px.png",
+		"models/skybox/textures/nx.png",
+		"models/skybox/textures/py.png",
+		"models/skybox/textures/ny.png",
+		"models/skybox/textures/pz.png",
+		"models/skybox/textures/nz.png"
 	};
 	for (unsigned int i = 0; i < 6; i++)
 	{
@@ -488,6 +490,7 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/structures/roof.obj", models::roofContext);
 	loadModelToContext("./models/structures/ceiling.obj", models::ceilingContext);
 	loadModelToContext("./models/structures/floor.obj", models::floorContext);
+	loadModelToContext("./models/structures/ground/ground.obj", models::groundContext);
 
 	//load furnitures
 	loadModelToContext("./models/furnitures/bed.obj", models::bedContext);
@@ -495,12 +498,13 @@ void init(GLFWwindow* window)
 	loadModelToContext("./models/furnitures/desk.obj", models::deskContext);
 	loadModelToContext("./models/furnitures/door.obj", models::doorContext);
 	loadModelToContext("./models/furnitures/drawer.obj", models::drawerContext);
-	loadModelToContext("./models/furnitures/marble_bust.obj", models::marbleBustContext);
+	loadModelToContext("./models/furnitures/marable_bust.obj", models::marbleBustContext);
 	loadModelToContext("./models/furnitures/materace.obj", models::materaceContext);
 	loadModelToContext("./models/furnitures/pencils.obj", models::pencilsContext);
 	loadModelToContext("./models/furnitures/huge_window.obj", models::hugeWindowContext);
 	loadModelToContext("./models/furnitures/small_window_1.obj", models::smallWindow1Context);
 	loadModelToContext("./models/furnitures/small_window_2.obj", models::smallWindow2Context);
+	loadModelToContext("./models/furnitures/painting/painting.obj", models::painting);
 
 	//load player
 	loadModelToContext("./models/flyModels/fly0.obj", models::fly0Context);
