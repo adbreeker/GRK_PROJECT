@@ -22,6 +22,7 @@ uniform vec3 spotlightPhi;
 
 uniform float metallic;
 uniform float roughness;
+uniform float brightness;
 
 uniform float exposition;
 
@@ -37,8 +38,7 @@ in vec3 lightDirTS;
 in vec3 spotlightDirTS;
 in vec3 sunDirTS;
 
-in vec3 test;
-vec3 color = texture(colorTexture, vecTex).xyz;
+vec3 color = texture(colorTexture, vecTex).xyz * brightness;
 
 
 float DistributionGGX(vec3 normal, vec3 H, float roughness){
@@ -115,6 +115,7 @@ void main()
 	vec3 lightDir = normalize(lightPos-worldPos);
 
 
+
 	vec3 ambient = AMBIENT*color;
 	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2);
 	vec3 ilumination;
@@ -134,6 +135,4 @@ void main()
 
     
 	outColor = vec4(vec3(1.0) - exp(-ilumination*exposition),1);
-	//outColor = vec4(roughness,metallic,0,1);
-    //outColor = vec4(test;
 }

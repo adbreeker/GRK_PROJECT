@@ -91,34 +91,28 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\shader_8_sun.vert">
+    <None Include="shaders\shader_sun.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\shader_8_sun.frag">
+    <None Include="shaders\shader_sun.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\shader_9_1.frag">
+    <None Include="shaders\shader_pbr.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\shader_9_1.vert">
+    <None Include="shaders\shader_pbr.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\test.frag">
+    <None Include="shaders\shader_pbr_tex.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shaders\test.vert">
+    <None Include="shaders\shader_pbr_tex.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shader_skybox.frag">
+    <None Include="shaders\shader_skybox.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shader_skybox.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shader_pbr_tex.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shader_pbr_tex.vert">
+    <None Include="shaders\shader_skybox.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
