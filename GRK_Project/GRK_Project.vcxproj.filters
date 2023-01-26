@@ -115,5 +115,11 @@
     <None Include="shader_skybox.vert">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="shader_pbr_tex.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shader_pbr_tex.vert">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

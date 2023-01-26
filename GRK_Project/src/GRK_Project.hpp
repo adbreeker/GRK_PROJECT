@@ -63,7 +63,7 @@ namespace textures
 	GLuint ground;
 
 	//furnitures
-
+	GLuint painting;
 
 	//player
 }
@@ -172,6 +172,7 @@ glm::mat4 createPerspectiveMatrix()
 //drawPBR ----------------------------------------------------------------------------------------------------------------------------------------------------------- drawPBR
 void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, float roughness, float metallic) 
 {
+	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -196,6 +197,36 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 	glUniform3f(glGetUniformLocation(program, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
 	glUniform3f(glGetUniformLocation(program, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
 	glUniform1f(glGetUniformLocation(program, "spotlightPhi"), spotlightPhi);
+	Core::DrawContext(context);
+}
+
+void drawObjectPBRTex(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureId, float roughness, float metallic)
+{
+	glUseProgram(programTex);
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
+	glUniformMatrix4fv(glGetUniformLocation(programTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(programTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+
+	glUniform1f(glGetUniformLocation(programTex, "exposition"), exposition);
+
+	glUniform1f(glGetUniformLocation(programTex, "roughness"), roughness);
+	glUniform1f(glGetUniformLocation(programTex, "metallic"), metallic);
+
+
+	glUniform3f(glGetUniformLocation(programTex, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+
+	glUniform3f(glGetUniformLocation(programTex, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
+	glUniform3f(glGetUniformLocation(programTex, "sunColor"), sunColor.x * sunForce / 100, sunColor.y * sunForce / 100, sunColor.z * sunForce / 100);
+
+	glUniform3f(glGetUniformLocation(programTex, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
+	glUniform3f(glGetUniformLocation(programTex, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
+
+	glUniform3f(glGetUniformLocation(programTex, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
+	glUniform3f(glGetUniformLocation(programTex, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
+	glUniform3f(glGetUniformLocation(programTex, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
+	glUniform1f(glGetUniformLocation(programTex, "spotlightPhi"), spotlightPhi);
+	Core::SetActiveTexture(textureId, "colorTexture", programTex, 0);
 	Core::DrawContext(context);
 }
 
@@ -386,7 +417,8 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::roofContext, glm::mat4(), glm::vec3(40.0f, 0.0f, 0.0f), 0.8f, 0.0f);
 	drawObjectPBR(models::floorContext, glm::mat4(), glm::vec3(5.0f, 0.0f, 0.0f), 1.0f, 1.0f);
 	drawObjectPBR(models::roomContext, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), 0.8f, 0.0f);
-	drawObjectPBR(models::groundContext, glm::mat4(), glm::vec3(2.0f, 3.5f, 2.0f), 1.0f, 1.0f);
+	//drawObjectPBR(models::groundContext, glm::mat4(), glm::vec3(2.0f, 3.5f, 2.0f), 1.0f, 1.0f);
+	drawObjectPBRTex(models::groundContext, glm::mat4(), textures::ground, 0.2f, 0.2f);
 
 	//render furnitures
 	drawObjectPBR(models::bedContext, glm::mat4(), glm::vec3(0.03f, 0.03f, 0.03f), 0.2f, 0.0f);
@@ -400,7 +432,8 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::hugeWindowContext, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
 	drawObjectPBR(models::smallWindow1Context, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
 	drawObjectPBR(models::smallWindow2Context, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
-	drawObjectPBR(models::painting, glm::mat4(), glm::vec3(10.0f, 10.0f, 10.0f), 0.0f, 0.0f);
+	//drawObjectPBR(models::painting, glm::mat4(), glm::vec3(10.0f, 10.0f, 10.0f), 0.0f, 0.0f);
+	drawObjectPBRTex(models::painting, glm::mat4(), textures::painting, 0.0f, 0.0f);
 
 	//render and animate player
 	animatePlayer();
@@ -483,6 +516,8 @@ void init(GLFWwindow* window)
 	programTest = shaderLoader.CreateProgram("shaders/test.vert", "shaders/test.frag");
 	programSun = shaderLoader.CreateProgram("shaders/shader_8_sun.vert", "shaders/shader_8_sun.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
+	programTex = shaderLoader.CreateProgram("shaders/shader_pbr_tex.vert", "shaders/shader_pbr_tex.frag");
+	
 
 	//load structures
 	loadModelToContext("./models/structures/sphere.obj", models::sphereContext);
@@ -517,6 +552,10 @@ void init(GLFWwindow* window)
 	//load skybox and it's textures
 	loadModelToContext("./models/skybox/cube.obj", models::skyboxContext);
 	loadSkyboxTextures();
+
+	//load textures
+	textures::painting = Core::LoadTexture("./models/furnitures/painting/Texture.png");
+	textures::ground = Core::LoadTexture("./models/structures/ground/texture.png");
 }
 
 
