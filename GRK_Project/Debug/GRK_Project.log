@@ -1,24 +1,19 @@
 ﻿  main.cpp
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
-J:\grafika2\dependencies\glfw-3.3.8.bin.WIN32\include\GLFW\glfw3.h(123): message : see previous definition of 'APIENTRY'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(99,30): warning C4305: 'initializing': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(116,38): warning C4305: '=': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(142,16): warning C4305: 'initializing': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(237,3): warning C4305: 'argument': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(245,3): warning C4305: 'argument': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(253,3): warning C4305: 'argument': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(261,3): warning C4305: 'argument': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(269,3): warning C4305: 'argument': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(277,3): warning C4305: 'argument': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(286,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(331,108): warning C4305: 'argument': truncation from 'double' to 'T'
-          with
-          [
-              T=float
-          ]
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(369,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(579,21): warning C4305: '-=': truncation from 'double' to 'float'
-J:\grafika2\GRK_Project\src\GRK_Project.hpp(582,21): warning C4305: '+=': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\dependencies\glfw-3.3.8.bin.WIN32\include\GLFW\glfw3.h(123,1): message : see previous definition of 'APIENTRY'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(103,30): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(120,38): warning C4305: '=': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(146,16): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(241,3): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(249,3): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(257,3): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(265,3): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(273,3): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(281,3): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(290,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(365,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(576,21): warning C4305: '-=': truncation from 'double' to 'float'
+D:\Github_repositories\GRK_PROJECT\GRK_Project\src\GRK_Project.hpp(579,21): warning C4305: '+=': truncation from 'double' to 'float'
 Box.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
 LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-  GRK_Project.vcxproj -> J:\grafika2\Debug\GRK_Project.exe
+  GRK_Project.vcxproj -> D:\Github_repositories\GRK_PROJECT\Debug\GRK_Project.exe
