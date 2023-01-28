@@ -22,6 +22,7 @@ uniform vec3 spotlightPhi;
 
 uniform float metallic;
 uniform float roughness;
+uniform float brightness;
 
 uniform float exposition;
 
@@ -37,6 +38,8 @@ in vec3 spotlightDirTS;
 in vec3 sunDirTS;
 
 in vec3 test;
+
+vec3 colorB = color * brightness;
 
 float DistributionGGX(vec3 normal, vec3 H, float roughness){
     float a      = roughness*roughness;
@@ -76,7 +79,7 @@ vec3 PBRLight(vec3 lightDir, vec3 radiance, vec3 normal, vec3 V){
 
 	//vec3 V = normalize(cameraPos-worldPos);
 	vec3 F0 = vec3(0.04); 
-    F0 = mix(F0, color, metallic);
+    F0 = mix(F0, colorB, metallic);
 
     vec3 H = normalize(V + lightDir);    
         
@@ -95,7 +98,7 @@ vec3 PBRLight(vec3 lightDir, vec3 radiance, vec3 normal, vec3 V){
             
     // add to outgoing radiance Lo
     float NdotL = max(dot(normal, lightDir), 0.0);   
-	return (kD * color / PI + specular) * radiance * NdotL;
+	return (kD * colorB / PI + specular) * radiance * NdotL;
 }
 
 
@@ -111,7 +114,7 @@ void main()
 	vec3 lightDir = normalize(lightPos-worldPos);
 
 
-	vec3 ambient = AMBIENT*color;
+	vec3 ambient = AMBIENT*colorB;
 	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2);
 	vec3 ilumination;
 	ilumination = ambient+PBRLight(lightDir,attenuatedlightColor,normal,viewDir);

@@ -22,50 +22,71 @@ int WIDTH = 800, HEIGHT = 800;
 //models ------------------------------------------------------------------------------------------------------------------------------------------------------------- models
 namespace models 
 {
-	// structures
-	Core::RenderContext roomContext;
-	Core::RenderContext roofContext;
-	Core::RenderContext ceilingContext;
-	Core::RenderContext floorContext;
-	Core::RenderContext sphereContext;
-	Core::RenderContext groundContext;
-	Core::RenderContext skyboxContext;
+	//structures
+	Core::RenderContext room;
+	Core::RenderContext roof;
+	Core::RenderContext ceiling;
+	Core::RenderContext floor;
+	Core::RenderContext sphere;
+	Core::RenderContext ground;
+	Core::RenderContext skybox;
 
 	//furnitures
-	Core::RenderContext hugeWindowContext;
-	Core::RenderContext smallWindow1Context;
-	Core::RenderContext smallWindow2Context;
-	Core::RenderContext bedContext;
-	Core::RenderContext chairContext;
-	Core::RenderContext deskContext;
-	Core::RenderContext doorContext;
-	Core::RenderContext drawerContext;
-	Core::RenderContext marbleBustContext;
-	Core::RenderContext materaceContext;
-	Core::RenderContext pencilsContext;
+	Core::RenderContext hugeWindow;
+	Core::RenderContext smallWindow1;
+	Core::RenderContext smallWindow2;
+	Core::RenderContext bed;
+	Core::RenderContext chair;
+	Core::RenderContext desk;
+	Core::RenderContext door;
+	Core::RenderContext drawer;
+	Core::RenderContext marbleBust;
+	Core::RenderContext materace;
+	Core::RenderContext pencils;
 	Core::RenderContext painting;
 
-
 	//player
-	Core::RenderContext fly0Context;
-	Core::RenderContext fly1Context;
-	Core::RenderContext fly2Context;
-	Core::RenderContext fly3Context;
-	Core::RenderContext fly4Context;
-	Core::RenderContext fly5Context;
+	Core::RenderContext fly0;
+	Core::RenderContext fly1;
+	Core::RenderContext fly2;
+	Core::RenderContext fly3;
+	Core::RenderContext fly4;
+	Core::RenderContext fly5;
 
 }
 
 namespace textures 
 {
 	//structures
-	GLuint skybox;
+	GLuint room;
+	GLuint roof;
+	GLuint ceiling;
+	GLuint floor;
+	GLuint sphere;
 	GLuint ground;
+	GLuint skybox;
 
 	//furnitures
+	GLuint hugeWindow;
+	GLuint smallWindow1;
+	GLuint smallWindow2;
+	GLuint bed;
+	GLuint chair;
+	GLuint desk;
+	GLuint door;
+	GLuint drawer;
+	GLuint marbleBust;
+	GLuint materace;
+	GLuint pencils;
 	GLuint painting;
 
 	//player
+	GLuint fly0;
+	GLuint fly1;
+	GLuint fly2;
+	GLuint fly3;
+	GLuint fly4;
+	GLuint fly5;
 }
 
 //variables -------------------------------------------------------------------------------------------------------------------------------------------------------- variables
@@ -81,17 +102,17 @@ Core::Shader_Loader shaderLoader;
 
 
 //sun
-glm::vec3 sunDir = glm::vec3(-0.93633f, 0.351106, 0.003226f);
+glm::vec3 sunDir = glm::vec3(-0.93f, 0.35f, 0.00f);
 glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f);
 float sunForce = 5;
 
 //camera
-glm::vec3 cameraPos = glm::vec3(0.479490f, 1.250000f, -2.124680f);
-glm::vec3 cameraDir = glm::vec3(-0.354510f, 0.000000f, 0.935054f);
+glm::vec3 cameraPos = glm::vec3(0.48f, 1.25f, -2.12f);
+glm::vec3 cameraDir = glm::vec3(-0.35f, 0.00f, 0.93f);
 
 //player
-glm::vec3 playerPos = glm::vec3(0, 1.250000f, 0);
-glm::vec3 playerDir = glm::vec3(-0.0f, 0.000000f, 1.0f);
+glm::vec3 playerPos = glm::vec3(0.0f, 1.25f, -7.0f);
+glm::vec3 playerDir = glm::vec3(-0.0f, 0.00f, 1.0f);
 
 //apsect and exposition
 float aspectRatio = 1.f;
@@ -170,69 +191,54 @@ glm::mat4 createPerspectiveMatrix()
 
 
 //drawPBR ----------------------------------------------------------------------------------------------------------------------------------------------------------- drawPBR
-void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, float roughness, float metallic) 
+void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec3 color, GLuint textureId, float roughness, float metallic, float brightness) 
 {
-	glUseProgram(programPBR);
+	GLuint program;
+	if (textureId == NULL)
+	{
+		program = programPBR;
+	}
+	else
+	{
+		program = programTex;
+	}
+
+	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(programPBR, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniformMatrix4fv(glGetUniformLocation(programPBR, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 
-	glUniform1f(glGetUniformLocation(programPBR, "exposition"), exposition);
+	glUniform1f(glGetUniformLocation(program, "exposition"), exposition);
 
-	glUniform1f(glGetUniformLocation(programPBR, "roughness"), roughness);
-	glUniform1f(glGetUniformLocation(programPBR, "metallic"), metallic);
+	glUniform1f(glGetUniformLocation(program, "roughness"), roughness);
+	glUniform1f(glGetUniformLocation(program, "metallic"), metallic);
+	glUniform1f(glGetUniformLocation(program, "brightness"), brightness);
 
-	glUniform3f(glGetUniformLocation(programPBR, "color"), color.x, color.y, color.z);
+	glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 
-	glUniform3f(glGetUniformLocation(programPBR, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+	glUniform3f(glGetUniformLocation(program, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
+	glUniform3f(glGetUniformLocation(program, "sunColor"), sunColor.x * sunForce/100, sunColor.y * sunForce/100, sunColor.z * sunForce/100);
 
-	glUniform3f(glGetUniformLocation(programPBR, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
-	glUniform3f(glGetUniformLocation(programPBR, "sunColor"), sunColor.x * sunForce/100, sunColor.y * sunForce/100, sunColor.z * sunForce/100);
+	glUniform3f(glGetUniformLocation(program, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
+	glUniform3f(glGetUniformLocation(program, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
 
-	glUniform3f(glGetUniformLocation(programPBR, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
-	glUniform3f(glGetUniformLocation(programPBR, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
+	glUniform3f(glGetUniformLocation(program, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
+	glUniform3f(glGetUniformLocation(program, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
+	glUniform3f(glGetUniformLocation(program, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
+	glUniform1f(glGetUniformLocation(program, "spotlightPhi"), spotlightPhi);
 
-	glUniform3f(glGetUniformLocation(programPBR, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
-	glUniform3f(glGetUniformLocation(programPBR, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
-	glUniform3f(glGetUniformLocation(programPBR, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
-	glUniform1f(glGetUniformLocation(programPBR, "spotlightPhi"), spotlightPhi);
+	if (textureId == NULL)
+	{
+		glUniform3f(glGetUniformLocation(program, "color"), color.x, color.y, color.z);
+	}
+	else
+	{
+		Core::SetActiveTexture(textureId, "colorTexture", programTex, 0);
+	}
+	
 	Core::DrawContext(context);
 }
-
-// drawPBR with texture
-void drawObjectPBRTex(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureId, float roughness, float metallic, float brightness)
-{
-	glUseProgram(programTex);
-	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
-	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(programTex, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniformMatrix4fv(glGetUniformLocation(programTex, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
-
-	glUniform1f(glGetUniformLocation(programTex, "exposition"), exposition);
-
-	glUniform1f(glGetUniformLocation(programTex, "roughness"), roughness);
-	glUniform1f(glGetUniformLocation(programTex, "metallic"), metallic);
-	glUniform1f(glGetUniformLocation(programTex, "brightness"), brightness);
-
-
-	glUniform3f(glGetUniformLocation(programTex, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
-
-	glUniform3f(glGetUniformLocation(programTex, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
-	glUniform3f(glGetUniformLocation(programTex, "sunColor"), sunColor.x * sunForce / 100, sunColor.y * sunForce / 100, sunColor.z * sunForce / 100);
-
-	glUniform3f(glGetUniformLocation(programTex, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
-	glUniform3f(glGetUniformLocation(programTex, "lightColor"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
-
-	glUniform3f(glGetUniformLocation(programTex, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
-	glUniform3f(glGetUniformLocation(programTex, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
-	glUniform3f(glGetUniformLocation(programTex, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
-	glUniform1f(glGetUniformLocation(programTex, "spotlightPhi"), spotlightPhi);
-	Core::SetActiveTexture(textureId, "colorTexture", programTex, 0);
-	Core::DrawContext(context);
-}
-
-
 
 //player animation ------------------------------------------------------------------------------------------------------------------------------------------- player animation
 void animatePlayer()
@@ -272,54 +278,28 @@ void animatePlayer()
 		}
 	}
 
-	if (animationState == 0)
+	Core::RenderContext player;
+
+	switch (animationState)
 	{
-		drawObjectPBR(models::fly0Context,
-			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
-			glm::vec3(3, 3, 3),
-			0.2, 1.0
-		);
+	case 0:
+		player = models::fly0; break;
+	case 1:
+		player = models::fly1; break;
+	case 2:
+		player = models::fly2; break;
+	case 3:
+		player = models::fly3; break;
+	case 4:
+		player = models::fly4; break;
+	case 5:
+		player = models::fly5; break;
 	}
-	if (animationState == 1)
-	{
-		drawObjectPBR(models::fly1Context,
-			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
-			glm::vec3(3, 3, 3),
-			0.2, 1.0
-		);
-	}
-	if (animationState == 2)
-	{
-		drawObjectPBR(models::fly2Context,
-			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
-			glm::vec3(3, 3, 3),
-			0.2, 1.0
-		);
-	}
-	if (animationState == 3)
-	{
-		drawObjectPBR(models::fly3Context,
-			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
-			glm::vec3(3, 3, 3),
-			0.2, 1.0
-		);
-	}
-	if (animationState == 4)
-	{
-		drawObjectPBR(models::fly4Context,
-			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
-			glm::vec3(3, 3, 3),
-			0.2, 1.0
-		);
-	}
-	if (animationState == 5)
-	{
-		drawObjectPBR(models::fly5Context,
-			glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
-			glm::vec3(3, 3, 3),
-			0.2, 1.0
-		);
-	}
+
+	drawObjectPBR(player,
+		glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
+		glm::vec3(3, 3, 3), NULL,
+		0.2f, 1.0, 1.0f);
 	
 }
 
@@ -354,7 +334,7 @@ void renderSun(float rotation)
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x * 2.5f, sunColor.y * 2.5f, sunColor.z * 2.5f);
 	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
-	Core::DrawContext(models::sphereContext);
+	Core::DrawContext(models::sphere);
 }
 
 void renderSkybox(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID)
@@ -375,7 +355,7 @@ void renderScene(GLFWwindow* window)
 	//skybox
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderSkybox(models::skyboxContext, glm::translate(glm::scale(glm::mat4(), glm::vec3(4.0f)), glm::vec3(0.0f,2.0f,0.0f)), textures::skybox);
+	renderSkybox(models::skybox, glm::translate(glm::scale(glm::mat4(), glm::vec3(4.0f)), glm::vec3(0.0f,2.0f,0.0f)), textures::skybox);
 
 	//time and delta time
 	float time = glfwGetTime();
@@ -389,25 +369,25 @@ void renderScene(GLFWwindow* window)
 	
 	
 	//render structures
-	drawObjectPBR(models::ceilingContext, glm::translate(glm::mat4(), glm::vec3(0.0f, -0.01f, 0.0f)), glm::vec3(10.0f, 10.0f, 10.0f), 0.8f, 0.0f);
-	drawObjectPBR(models::roofContext, glm::mat4(), glm::vec3(40.0f, 0.0f, 0.0f), 0.8f, 0.0f);
-	drawObjectPBR(models::floorContext, glm::mat4(), glm::vec3(5.0f, 0.0f, 0.0f), 1.0f, 1.0f);
-	drawObjectPBR(models::roomContext, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), 0.8f, 0.0f);
-	drawObjectPBRTex(models::groundContext, glm::mat4(), textures::ground, 1.0f, 1.0f, 30.0f);
+	drawObjectPBR(models::ceiling, glm::translate(glm::mat4(), glm::vec3(0.0f, -0.01f, 0.0f)), glm::vec3(10.0f, 10.0f, 10.0f), NULL, 0.8f, 0.0f, 1.0f);
+	drawObjectPBR(models::roof, glm::mat4(), glm::vec3(), textures::roof, 0.0f, 1.0f, 20.0f);
+	drawObjectPBR(models::floor, glm::mat4(), glm::vec3(5.0f, 0.0f, 0.0f), NULL, 1.0f, 1.0f, 1.0f);
+	drawObjectPBR(models::room, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), NULL, 0.8f, 0.0f, 1.0f);
+	drawObjectPBR(models::ground, glm::mat4(), glm::vec3(), textures::ground, 1.0f, 1.0f, 30.0f);
 
 	//render furnitures
-	drawObjectPBR(models::bedContext, glm::mat4(), glm::vec3(0.03f, 0.03f, 0.03f), 0.2f, 0.0f);
-	drawObjectPBR(models::chairContext, glm::mat4(), glm::vec3(0.2f, 0.4f, 0.8f), 0.4f, 0.0f);
-	drawObjectPBR(models::deskContext, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.0f), 0.2f, 0.0f);
-	drawObjectPBR(models::doorContext, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
-	drawObjectPBR(models::drawerContext, glm::mat4(), glm::vec3(0.4f, 0.08f, 0.03f), 0.2f, 0.0f);
-	drawObjectPBR(models::marbleBustContext, glm::mat4(), glm::vec3(1.0f, 1.0f, 1.0f), 0.5f, 1.0f);
-	drawObjectPBR(models::materaceContext, glm::mat4(), glm::vec3(0.9f, 0.9f, 0.9f), 0.8f, 0.0f);
-	drawObjectPBR(models::pencilsContext, glm::mat4(), glm::vec3(0.1f, 0.02f, 0.0f), 0.1f, 0.0f);
-	drawObjectPBR(models::hugeWindowContext, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
-	drawObjectPBR(models::smallWindow1Context, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
-	drawObjectPBR(models::smallWindow2Context, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), 0.2f, 0.0f);
-	drawObjectPBRTex(models::painting, glm::mat4(), textures::painting, 0.0f, 0.0f, 3.0f);
+	drawObjectPBR(models::bed, glm::mat4(), glm::vec3(0.03f, 0.03f, 0.03f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::chair, glm::mat4(), glm::vec3(0.2f, 0.4f, 0.8f), NULL, 0.4f, 0.0f, 1.0f);
+	drawObjectPBR(models::desk, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.0f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::door, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::drawer, glm::mat4(), glm::vec3(0.4f, 0.08f, 0.03f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::marbleBust, glm::mat4(), glm::vec3(1.0f, 1.0f, 1.0f), NULL, 0.5f, 1.0f, 1.0f);
+	drawObjectPBR(models::materace, glm::mat4(), glm::vec3(0.9f, 0.9f, 0.9f), NULL, 0.8f, 0.0f, 1.0f);
+	drawObjectPBR(models::pencils, glm::mat4(), glm::vec3(0.1f, 0.02f, 0.0f), NULL, 0.1f, 0.0f, 1.0f);
+	drawObjectPBR(models::hugeWindow, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::smallWindow1, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::smallWindow2, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::painting, glm::mat4(), glm::vec3(), textures::painting, 0.0f, 0.0f, 3.0f);
 
 	//render and animate player
 	animatePlayer();
@@ -431,10 +411,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 
-void loadModelToContext(std::string path, Core::RenderContext& context)
+void loadModelToContext(std::string pathObject, Core::RenderContext& context, std::string pathTexture, GLuint& texture)
 {
 	Assimp::Importer import;
-	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
+
+	const aiScene* scene = import.ReadFile(pathObject, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -442,9 +423,17 @@ void loadModelToContext(std::string path, Core::RenderContext& context)
 		return;
 	}
 	context.initFromAssimpMesh(scene->mMeshes[0]);
+
+	if (pathTexture != "")
+	{
+		texture = Core::LoadTexture(pathTexture.c_str());
+	}
 }
 
-void loadSkyboxTextures() {
+void loadSkyboxWithTextures(std::string pathObject, Core::RenderContext& context) 
+{
+	loadModelToContext(pathObject, context, "", textures::skybox);
+
 	int w, h;
 
 	glGenTextures(1, &textures::skybox);
@@ -492,43 +481,38 @@ void init(GLFWwindow* window)
 	
 	
 
-	//load structures
-	loadModelToContext("./models/structures/sphere.obj", models::sphereContext);
-	loadModelToContext("./models/structures/room.obj", models::roomContext);
-	loadModelToContext("./models/structures/roof.obj", models::roofContext);
-	loadModelToContext("./models/structures/ceiling.obj", models::ceilingContext);
-	loadModelToContext("./models/structures/floor.obj", models::floorContext);
-	loadModelToContext("./models/structures/ground/ground.obj", models::groundContext);
+	//load structures and their textures
+	loadModelToContext("./models/structures/sphere.obj", models::sphere, "", textures::sphere);
+	loadModelToContext("./models/structures/room.obj", models::room, "", textures::room);
+	loadModelToContext("./models/structures/roof/roof.obj", models::roof, "./models/structures/roof/texture.png", textures::roof);
+	loadModelToContext("./models/structures/ceiling.obj", models::ceiling, "", textures::ceiling);
+	loadModelToContext("./models/structures/floor.obj", models::floor, "", textures::floor);
+	loadModelToContext("./models/structures/ground/ground.obj", models::ground, "./models/structures/ground/texture.png", textures::ground);
 
-	//load furnitures
-	loadModelToContext("./models/furnitures/bed.obj", models::bedContext);
-	loadModelToContext("./models/furnitures/chair.obj", models::chairContext);
-	loadModelToContext("./models/furnitures/desk.obj", models::deskContext);
-	loadModelToContext("./models/furnitures/door.obj", models::doorContext);
-	loadModelToContext("./models/furnitures/drawer.obj", models::drawerContext);
-	loadModelToContext("./models/furnitures/marable_bust.obj", models::marbleBustContext);
-	loadModelToContext("./models/furnitures/materace.obj", models::materaceContext);
-	loadModelToContext("./models/furnitures/pencils.obj", models::pencilsContext);
-	loadModelToContext("./models/furnitures/huge_window.obj", models::hugeWindowContext);
-	loadModelToContext("./models/furnitures/small_window_1.obj", models::smallWindow1Context);
-	loadModelToContext("./models/furnitures/small_window_2.obj", models::smallWindow2Context);
-	loadModelToContext("./models/furnitures/painting/painting.obj", models::painting);
+	//load furnitures and their textures
+	loadModelToContext("./models/furnitures/bed.obj", models::bed, "", textures::bed);
+	loadModelToContext("./models/furnitures/chair.obj", models::chair, "", textures::chair);
+	loadModelToContext("./models/furnitures/desk.obj", models::desk, "", textures::desk);
+	loadModelToContext("./models/furnitures/door.obj", models::door, "", textures::door);
+	loadModelToContext("./models/furnitures/drawer.obj", models::drawer, "", textures::drawer);
+	loadModelToContext("./models/furnitures/marable_bust.obj", models::marbleBust, "", textures::marbleBust);
+	loadModelToContext("./models/furnitures/materace.obj", models::materace, "", textures::marbleBust);
+	loadModelToContext("./models/furnitures/pencils.obj", models::pencils, "", textures::pencils);
+	loadModelToContext("./models/furnitures/huge_window.obj", models::hugeWindow, "", textures::hugeWindow);
+	loadModelToContext("./models/furnitures/small_window_1.obj", models::smallWindow1, "", textures::smallWindow1);
+	loadModelToContext("./models/furnitures/small_window_2.obj", models::smallWindow2, "", textures::smallWindow2);
+	loadModelToContext("./models/furnitures/painting/painting.obj", models::painting, "./models/furnitures/painting/Texture.png", textures::painting); 
 
-	//load player
-	loadModelToContext("./models/flyModels/fly0.obj", models::fly0Context);
-	loadModelToContext("./models/flyModels/fly1.obj", models::fly1Context);
-	loadModelToContext("./models/flyModels/fly2.obj", models::fly2Context);
-	loadModelToContext("./models/flyModels/fly3.obj", models::fly3Context);
-	loadModelToContext("./models/flyModels/fly4.obj", models::fly4Context);
-	loadModelToContext("./models/flyModels/fly5.obj", models::fly5Context);
+	//load player and his texture
+	loadModelToContext("./models/flyModels/fly0.obj", models::fly0, "", textures::fly0);
+	loadModelToContext("./models/flyModels/fly1.obj", models::fly1, "", textures::fly1);
+	loadModelToContext("./models/flyModels/fly2.obj", models::fly2, "", textures::fly2);
+	loadModelToContext("./models/flyModels/fly3.obj", models::fly3, "", textures::fly3);
+	loadModelToContext("./models/flyModels/fly4.obj", models::fly4, "", textures::fly4);
+	loadModelToContext("./models/flyModels/fly5.obj", models::fly5, "", textures::fly5);
 
 	//load skybox and it's textures
-	loadModelToContext("./models/skybox/cube.obj", models::skyboxContext);
-	loadSkyboxTextures();
-
-	//load textures
-	textures::painting = Core::LoadTexture("./models/furnitures/painting/Texture.png");
-	textures::ground = Core::LoadTexture("./models/structures/ground/texture.png");
+	loadSkyboxWithTextures("./models/skybox/cube.obj", models::skybox);
 }
 
 
