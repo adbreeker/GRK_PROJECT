@@ -8,6 +8,7 @@
 #include "GRK_Project.hpp"
 
 
+
 int main(int argc, char** argv)
 {
 	// inicjalizacja glfw
@@ -36,8 +37,9 @@ int main(int argc, char** argv)
 
 	init(window);
 
-	// uruchomienie glownej petli
+	//uruchomienie glownej petli
 	renderLoop(window);
+	
 
 	shutdown(window);
 	glfwTerminate();

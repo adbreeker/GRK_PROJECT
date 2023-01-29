@@ -14,92 +14,24 @@
 #include "Texture.h"
 #include "Box.cpp"
 #include "SOIL/SOIL.h"
+#include "Models.hpp"
 
 //window variables
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 int WIDTH = 800, HEIGHT = 800;
 
-//models ------------------------------------------------------------------------------------------------------------------------------------------------------------- models
-namespace models 
-{
-	//structures
-	Core::RenderContext room;
-	Core::RenderContext roof;
-	Core::RenderContext ceiling;
-	Core::RenderContext floor;
-	Core::RenderContext sphere;
-	Core::RenderContext ground;
-	Core::RenderContext skybox;
-
-	//furnitures
-	Core::RenderContext hugeWindow;
-	Core::RenderContext smallWindow1;
-	Core::RenderContext smallWindow2;
-	Core::RenderContext bed;
-	Core::RenderContext chair;
-	Core::RenderContext desk;
-	Core::RenderContext door;
-	Core::RenderContext drawer;
-	Core::RenderContext marbleBust;
-	Core::RenderContext materace;
-	Core::RenderContext pencils;
-	Core::RenderContext painting;
-
-	//player
-	Core::RenderContext fly0;
-	Core::RenderContext fly1;
-	Core::RenderContext fly2;
-	Core::RenderContext fly3;
-	Core::RenderContext fly4;
-	Core::RenderContext fly5;
-
-}
-
-namespace textures 
-{
-	//structures
-	GLuint room;
-	GLuint roof;
-	GLuint ceiling;
-	GLuint floor;
-	GLuint sphere;
-	GLuint ground;
-	GLuint skybox;
-
-	//furnitures
-	GLuint hugeWindow;
-	GLuint smallWindow1;
-	GLuint smallWindow2;
-	GLuint bed;
-	GLuint chair;
-	GLuint desk;
-	GLuint door;
-	GLuint drawer;
-	GLuint marbleBust;
-	GLuint materace;
-	GLuint pencils;
-	GLuint painting;
-
-	//player
-	GLuint fly0;
-	GLuint fly1;
-	GLuint fly2;
-	GLuint fly3;
-	GLuint fly4;
-	GLuint fly5;
-}
-
 //variables -------------------------------------------------------------------------------------------------------------------------------------------------------- variables
+
+//depht
 GLuint depthMapFBO;
 GLuint depthMap;
 
+//shaders
 GLuint programPBR;
 GLuint programTex;
 GLuint programSun;
 GLuint programSkybox;
-
 Core::Shader_Loader shaderLoader;
-
 
 //sun
 glm::vec3 sunDir = glm::vec3(-0.93f, 0.35f, 0.00f);
@@ -411,63 +343,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 
-void loadModelToContext(std::string pathObject, Core::RenderContext& context, std::string pathTexture, GLuint& texture)
-{
-	Assimp::Importer import;
-
-	const aiScene* scene = import.ReadFile(pathObject, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
-
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-	{
-		std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
-		return;
-	}
-	context.initFromAssimpMesh(scene->mMeshes[0]);
-
-	if (pathTexture != "")
-	{
-		texture = Core::LoadTexture(pathTexture.c_str());
-	}
-}
-
-void loadSkyboxWithTextures(std::string pathObject, Core::RenderContext& context) 
-{
-	loadModelToContext(pathObject, context, "", textures::skybox);
-
-	int w, h;
-
-	glGenTextures(1, &textures::skybox);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textures::skybox);
-
-	const char* filepaths[6] = {
-		"models/skybox/textures/px.png",
-		"models/skybox/textures/nx.png",
-		"models/skybox/textures/py.png",
-		"models/skybox/textures/ny.png",
-		"models/skybox/textures/pz.png",
-		"models/skybox/textures/nz.png"
-	};
-	for (unsigned int i = 0; i < 6; i++)
-	{
-		unsigned char* image = SOIL_load_image(filepaths[i], &w, &h, 0, SOIL_LOAD_RGBA);
-		if (image) {
-			glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image
-			);
-		}
-		else {
-			std::cout << "Failed to load texture: " << filepaths[i] << std::endl;
-		}
-	}
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-}
-
 // init ------------------------------------------------------------------------------------------------------- init
 void init(GLFWwindow* window)
 {
@@ -479,40 +354,7 @@ void init(GLFWwindow* window)
 	programSun = shaderLoader.CreateProgram("shaders/shader_sun.vert", "shaders/shader_sun.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 	
-	
-
-	//load structures and their textures
-	loadModelToContext("./models/structures/sphere.obj", models::sphere, "", textures::sphere);
-	loadModelToContext("./models/structures/room.obj", models::room, "", textures::room);
-	loadModelToContext("./models/structures/roof/roof.obj", models::roof, "./models/structures/roof/texture.png", textures::roof);
-	loadModelToContext("./models/structures/ceiling.obj", models::ceiling, "", textures::ceiling);
-	loadModelToContext("./models/structures/floor.obj", models::floor, "", textures::floor);
-	loadModelToContext("./models/structures/ground/ground.obj", models::ground, "./models/structures/ground/texture.png", textures::ground);
-
-	//load furnitures and their textures
-	loadModelToContext("./models/furnitures/bed.obj", models::bed, "", textures::bed);
-	loadModelToContext("./models/furnitures/chair.obj", models::chair, "", textures::chair);
-	loadModelToContext("./models/furnitures/desk.obj", models::desk, "", textures::desk);
-	loadModelToContext("./models/furnitures/door.obj", models::door, "", textures::door);
-	loadModelToContext("./models/furnitures/drawer.obj", models::drawer, "", textures::drawer);
-	loadModelToContext("./models/furnitures/marable_bust.obj", models::marbleBust, "", textures::marbleBust);
-	loadModelToContext("./models/furnitures/materace.obj", models::materace, "", textures::marbleBust);
-	loadModelToContext("./models/furnitures/pencils.obj", models::pencils, "", textures::pencils);
-	loadModelToContext("./models/furnitures/huge_window.obj", models::hugeWindow, "", textures::hugeWindow);
-	loadModelToContext("./models/furnitures/small_window_1.obj", models::smallWindow1, "", textures::smallWindow1);
-	loadModelToContext("./models/furnitures/small_window_2.obj", models::smallWindow2, "", textures::smallWindow2);
-	loadModelToContext("./models/furnitures/painting/painting.obj", models::painting, "./models/furnitures/painting/Texture.png", textures::painting); 
-
-	//load player and his texture
-	loadModelToContext("./models/flyModels/fly0.obj", models::fly0, "", textures::fly0);
-	loadModelToContext("./models/flyModels/fly1.obj", models::fly1, "", textures::fly1);
-	loadModelToContext("./models/flyModels/fly2.obj", models::fly2, "", textures::fly2);
-	loadModelToContext("./models/flyModels/fly3.obj", models::fly3, "", textures::fly3);
-	loadModelToContext("./models/flyModels/fly4.obj", models::fly4, "", textures::fly4);
-	loadModelToContext("./models/flyModels/fly5.obj", models::fly5, "", textures::fly5);
-
-	//load skybox and it's textures
-	loadSkyboxWithTextures("./models/skybox/cube.obj", models::skybox);
+	loadAllModels();
 }
 
 

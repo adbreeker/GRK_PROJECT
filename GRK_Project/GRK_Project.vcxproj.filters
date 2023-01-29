@@ -89,6 +89,15 @@
     <ClInclude Include="src\GRK_Project.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Models.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Models.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader_sun.vert">
@@ -115,5 +124,10 @@
     <None Include="shaders\shader_skybox.vert">
       <Filter>Shader Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GRK_Project.rc">
+      <Filter>Shader Files\Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
