@@ -11,6 +11,7 @@ namespace models
 	Core::RenderContext floor;
 	Core::RenderContext sphere;
 	Core::RenderContext ground;
+	Core::RenderContext walls;
 	Core::RenderContext skybox;
 
 	//furnitures
@@ -21,9 +22,10 @@ namespace models
 	Core::RenderContext chair;
 	Core::RenderContext desk;
 	Core::RenderContext door;
+	Core::RenderContext jamb;
 	Core::RenderContext drawer;
 	Core::RenderContext marbleBust;
-	Core::RenderContext materace;
+	Core::RenderContext mattress;
 	Core::RenderContext pencils;
 	Core::RenderContext painting;
 
@@ -47,6 +49,7 @@ namespace textures
 	GLuint floor;
 	GLuint sphere;
 	GLuint ground;
+	GLuint walls;
 	GLuint skybox;
 
 	//furnitures
@@ -57,9 +60,10 @@ namespace textures
 	GLuint chair;
 	GLuint desk;
 	GLuint door;
+	GLuint jamb;
 	GLuint drawer;
 	GLuint marbleBust;
-	GLuint materace;
+	GLuint mattress;
 	GLuint pencils;
 	GLuint painting;
 
@@ -82,6 +86,7 @@ namespace objects_paths
 	std::string floor = "./models/structures/floor";
 	std::string sphere = "./models/structures/sphere";
 	std::string ground = "./models/structures/ground";
+	std::string walls = "./models/structures/walls";
 	std::string skybox = "./models/structures/skybox";
 
 	//furnitures
@@ -92,9 +97,10 @@ namespace objects_paths
 	std::string chair = "./models/furnitures/chair";
 	std::string desk = "./models/furnitures/desk";
 	std::string door = "./models/furnitures/door";
+	std::string jamb = "./models/furnitures/jamb";
 	std::string drawer = "./models/furnitures/drawer";;
 	std::string marbleBust = "./models/furnitures/marable_bust";
-	std::string materace = "./models/furnitures/materace";
+	std::string mattress = "./models/furnitures/mattress";
 	std::string pencils = "./models/furnitures/pencils";
 	std::string painting = "./models/furnitures/painting";
 
@@ -224,15 +230,17 @@ void loadAllModels()
 	loadModelToContext(objects_paths::ceiling, models::ceiling, textures::ceiling);
 	loadModelToContext(objects_paths::floor, models::floor, textures::floor);
 	loadModelToContext(objects_paths::ground, models::ground, textures::ground);
+	loadModelToContext(objects_paths::walls, models::walls, textures::walls);
 
 	//load furnitures and their textures
 	loadModelToContext(objects_paths::bed, models::bed, textures::bed);
 	loadModelToContext(objects_paths::chair, models::chair, textures::chair);
 	loadModelToContext(objects_paths::desk, models::desk, textures::desk);
 	loadModelToContext(objects_paths::door, models::door, textures::door);
+	loadModelToContext(objects_paths::jamb, models::jamb, textures::jamb);
 	loadModelToContext(objects_paths::drawer, models::drawer, textures::drawer);
 	loadModelToContext(objects_paths::marbleBust, models::marbleBust, textures::marbleBust);
-	loadModelToContext(objects_paths::materace, models::materace, textures::marbleBust);
+	loadModelToContext(objects_paths::mattress, models::mattress, textures::mattress);
 	loadModelToContext(objects_paths::pencils, models::pencils, textures::pencils);
 	loadModelToContext(objects_paths::hugeWindow, models::hugeWindow, textures::hugeWindow);
 	loadModelToContext(objects_paths::smallWindow1, models::smallWindow1, textures::smallWindow1);
