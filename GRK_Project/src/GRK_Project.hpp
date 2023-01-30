@@ -301,24 +301,26 @@ void renderScene(GLFWwindow* window)
 	
 	
 	//render structures
-	drawObjectPBR(models::ceiling, glm::translate(glm::mat4(), glm::vec3(0.0f, -0.01f, 0.0f)), glm::vec3(10.0f, 10.0f, 10.0f), NULL, 0.8f, 0.0f, 1.0f);
+	drawObjectPBR(models::ceiling, glm::mat4(), glm::vec3(), textures::ceiling, 0.8f, 0.0f, 10.0f);
 	drawObjectPBR(models::roof, glm::mat4(), glm::vec3(), textures::roof, 0.0f, 1.0f, 20.0f);
-	drawObjectPBR(models::floor, glm::mat4(), glm::vec3(5.0f, 0.0f, 0.0f), NULL, 1.0f, 1.0f, 1.0f);
-	drawObjectPBR(models::room, glm::mat4(), glm::vec3(10.0f, 0.1f, 3.0f), NULL, 0.8f, 0.0f, 1.0f);
+	drawObjectPBR(models::floor, glm::mat4(), glm::vec3(), textures::floor, 1.0f, 1.0f, 15.0f);
+	drawObjectPBR(models::room, glm::mat4(), glm::vec3(), textures::room, 0.8f, 1.0f, 7.0f);
 	drawObjectPBR(models::ground, glm::mat4(), glm::vec3(), textures::ground, 1.0f, 1.0f, 30.0f);
+	drawObjectPBR(models::walls, glm::mat4(), glm::vec3(), textures::walls, 1.0f, 1.0f, 5.0f);
 
 	//render furnitures
-	drawObjectPBR(models::bed, glm::mat4(), glm::vec3(0.03f, 0.03f, 0.03f), NULL, 0.2f, 0.0f, 1.0f);
-	drawObjectPBR(models::chair, glm::mat4(), glm::vec3(0.2f, 0.4f, 0.8f), NULL, 0.4f, 0.0f, 1.0f);
-	drawObjectPBR(models::desk, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.0f), NULL, 0.2f, 0.0f, 1.0f);
-	drawObjectPBR(models::door, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), NULL, 0.2f, 0.0f, 1.0f);
-	drawObjectPBR(models::drawer, glm::mat4(), glm::vec3(0.4f, 0.08f, 0.03f), NULL, 0.2f, 0.0f, 1.0f);
-	drawObjectPBR(models::marbleBust, glm::mat4(), glm::vec3(1.0f, 1.0f, 1.0f), NULL, 0.5f, 1.0f, 1.0f);
-	drawObjectPBR(models::materace, glm::mat4(), glm::vec3(0.9f, 0.9f, 0.9f), NULL, 0.8f, 0.0f, 1.0f);
-	drawObjectPBR(models::pencils, glm::mat4(), glm::vec3(0.1f, 0.02f, 0.0f), NULL, 0.1f, 0.0f, 1.0f);
-	drawObjectPBR(models::hugeWindow, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), NULL, 0.2f, 0.0f, 1.0f);
-	drawObjectPBR(models::smallWindow1, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), NULL, 0.2f, 0.0f, 1.0f);
-	drawObjectPBR(models::smallWindow2, glm::mat4(), glm::vec3(0.4f, 0.1f, 0.05f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::bed, glm::mat4(), glm::vec3(), textures::bed, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::chair, glm::mat4(), glm::vec3(), textures::chair, 0.4f, 0.0f, 1.0f);
+	drawObjectPBR(models::desk, glm::mat4(), glm::vec3(), textures::desk, 0.2f, 0.0f, 3.0f);
+	drawObjectPBR(models::door, glm::mat4(), glm::vec3(), textures::door, 0.9f, 0.0f, 3.0f);
+	drawObjectPBR(models::jamb, glm::mat4(), glm::vec3(), textures::jamb, 0.2f, 0.0f, 3.0f);
+	drawObjectPBR(models::drawer, glm::mat4(), glm::vec3(), textures::drawer, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::marbleBust, glm::mat4(), glm::vec3(), textures::marbleBust, 0.9f, 1.0f, 10.0f);
+	drawObjectPBR(models::mattress, glm::mat4(), glm::vec3(), textures::mattress, 0.8f, 0.0f, 1.0f);
+	drawObjectPBR(models::pencils, glm::mat4(), glm::vec3(0.1f, 0.02f, 0.0f), textures::pencils, 0.0f, 0.0f, 3.0f);
+	drawObjectPBR(models::hugeWindow, glm::mat4(), glm::vec3(5.0f, 5.0f, 5.0f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::smallWindow1, glm::mat4(), glm::vec3(5.0f, 5.0f, 5.0f), NULL, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::smallWindow2, glm::mat4(), glm::vec3(5.0f, 5.0f, 5.0f), NULL, 0.2f, 0.0f, 1.0f);
 	drawObjectPBR(models::painting, glm::mat4(), glm::vec3(), textures::painting, 0.0f, 0.0f, 3.0f);
 
 	//render and animate player
