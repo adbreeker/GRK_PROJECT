@@ -66,6 +66,10 @@ float spotlightPhi = 3.14 / 4;
 int animationState = 0;
 bool animationStateRising = true;
 
+//door animation
+float doorRotation=0.0f;
+bool animationStarted = false;
+
 
 //delta time ------------------------------------------------------------------------------------------------------------------------------------------------------- delta time
 float lastTime = -1.f;
@@ -172,7 +176,7 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 	Core::DrawContext(context);
 }
 
-//player animation ------------------------------------------------------------------------------------------------------------------------------------------- player animation
+//animations ----------------------------------------------------------------------------------------------------------------------------------------------------- animations
 void animatePlayer()
 {
 	glm::vec3 playerSide = glm::normalize(glm::cross(playerDir, glm::vec3(0.f, 1.f, 0.f)));
@@ -211,28 +215,42 @@ void animatePlayer()
 	}
 
 	Core::RenderContext player;
+	GLuint texture;
 
 	switch (animationState)
 	{
 	case 0:
-		player = models::fly0; break;
+		player = models::fly0; texture = textures::fly0; break;
 	case 1:
-		player = models::fly1; break;
+		player = models::fly1; texture = textures::fly1; break;
 	case 2:
-		player = models::fly2; break;
+		player = models::fly2; texture = textures::fly2; break;
 	case 3:
-		player = models::fly3; break;
+		player = models::fly3; texture = textures::fly3; break;
 	case 4:
-		player = models::fly4; break;
+		player = models::fly4; texture = textures::fly4; break;
 	case 5:
-		player = models::fly5; break;
+		player = models::fly5; texture = textures::fly5; break;
 	}
 
 	drawObjectPBR(player,
 		glm::translate(playerPos) * playerCameraRotrationMatrix * glm::eulerAngleY(glm::pi<float>()) * glm::scale(glm::vec3(0.1f)),
-		glm::vec3(3, 3, 3), NULL,
-		0.2f, 1.0, 1.0f);
+		glm::vec3(), texture,
+		0.2f, 1.0, 10.0f);
 	
+}
+
+void animateDoor()
+{
+	if (doorRotation > -130 && animationStarted)
+	{
+		doorRotation--;
+	}
+	glm::vec3 pivot = glm::vec3(0.411f, 0.957f, 4.628f);
+	glm::mat4 to_pivot = glm::translate(glm::mat4(), -pivot);
+	glm::mat4 from_pivot = glm::translate(glm::mat4(), pivot);
+	glm::mat4 rotate = to_pivot*glm::rotate(glm::mat4(), glm::radians(doorRotation), glm::vec3(0, 1, 0))*from_pivot;
+	drawObjectPBR(models::door, glm::mat4()*rotate, glm::vec3(), textures::door, 0.9f, 0.0f, 3.0f);
 }
 
 
@@ -312,7 +330,7 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::bed, glm::mat4(), glm::vec3(), textures::bed, 0.2f, 0.0f, 1.0f);
 	drawObjectPBR(models::chair, glm::mat4(), glm::vec3(), textures::chair, 0.4f, 0.0f, 1.0f);
 	drawObjectPBR(models::desk, glm::mat4(), glm::vec3(), textures::desk, 0.2f, 0.0f, 3.0f);
-	drawObjectPBR(models::door, glm::mat4(), glm::vec3(), textures::door, 0.9f, 0.0f, 3.0f);
+	animateDoor();
 	drawObjectPBR(models::jamb, glm::mat4(), glm::vec3(), textures::jamb, 0.2f, 0.0f, 3.0f);
 	drawObjectPBR(models::drawer, glm::mat4(), glm::vec3(), textures::drawer, 0.2f, 0.0f, 1.0f);
 	drawObjectPBR(models::marbleBust, glm::mat4(), glm::vec3(), textures::marbleBust, 0.9f, 1.0f, 10.0f);
@@ -389,6 +407,7 @@ void processInput(GLFWwindow* window)
 	//motion
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		playerPos += playerDir * moveSpeed;
+		animationStarted = true;
 	}	
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		playerPos -= playerDir * moveSpeed;
