@@ -37,6 +37,11 @@ namespace models
 	Core::RenderContext fly4;
 	Core::RenderContext fly5;
 
+	//environment
+	Core::RenderContext tree;
+	Core::RenderContext bush;
+	Core::RenderContext rock;
+
 }
 
 //textures ----------------------------------------------------------------------------------------------------------------------------------------------------- textures
@@ -74,6 +79,11 @@ namespace textures
 	GLuint fly3;
 	GLuint fly4;
 	GLuint fly5;
+
+	//environment
+	GLuint tree;
+	GLuint bush;
+	GLuint rock;
 }
 
 //paths ----------------------------------------------------------------------------------------------------------------------------------------------------------path
@@ -111,6 +121,11 @@ namespace objects_paths
 	std::string fly3 = "./models/player/fly3";
 	std::string fly4 = "./models/player/fly4";
 	std::string fly5 = "./models/player/fly5";
+
+	//environment
+	std::string tree = "./models/environment/tree";
+	std::string bush = "./models/environment/bush";
+	std::string rock = "./models/environment/rock";
 }
 
 //get certain element path ------------------------------------------------------------------------------------------------------------------ get certain element path
@@ -257,4 +272,9 @@ void loadAllModels()
 
 	//load skybox and it's textures
 	loadSkyboxWithTextures(objects_paths::skybox, models::skybox);
+
+	//load environment objects and their textures 
+	loadModelToContext(objects_paths::tree, models::tree, textures::tree);
+	loadModelToContext(objects_paths::bush, models::bush, textures::bush);
+	loadModelToContext(objects_paths::rock, models::rock, textures::rock);
 }

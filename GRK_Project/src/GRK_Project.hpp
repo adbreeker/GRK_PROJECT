@@ -34,7 +34,8 @@ GLuint programSkybox;
 Core::Shader_Loader shaderLoader;
 
 //sun
-glm::vec3 sunDir = glm::vec3(-0.93f, 0.35f, 0.00f);
+float sunx = -10.0f, suny = 2.0f, sunz = -5.0f;
+glm::vec3 sunDir = glm::vec3(sunx, suny, sunz);
 glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f);
 float sunForce = 5;
 
@@ -51,10 +52,8 @@ float aspectRatio = 1.f;
 float exposition = 1.f;
 
 //pointlight (sun)
-glm::vec3 basePointlightPos = glm::vec3(0, 100.0f, 0);
-glm::vec3 pointlightPos = basePointlightPos;
+glm::vec3 pointlightPos = glm::vec3(-17.0f, 10.0f, 0.0f);
 glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6);
-float sunPositionTranslateModifier = -85.0f;
 
 //spotlight (player)
 glm::vec3 spotlightPos = glm::vec3(0, 0, 0);
@@ -272,18 +271,17 @@ void renderShadowapSun()
 
 
 //render scene objects ----------------------------------------------------------------------------------------------------------------------------------- render scene objects
-void renderSun(float rotation)
+void renderSun()
 {
 	glUseProgram(programSun);
-
-	glm::vec3 pointlightPos = glm::vec3(glm::eulerAngleZ((rotation * 3.142)/180) * glm::vec4(basePointlightPos, 0));
-	sunDir = pointlightPos;
-
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
-	glm::mat4 transformation = viewProjectionMatrix * glm::translate(pointlightPos + glm::vec3(0.0f,sunPositionTranslateModifier,0.0f)) * glm::scale(glm::vec3(1.0f));
+	glm::mat4 transformation = viewProjectionMatrix * glm::translate(pointlightPos + glm::vec3(0.0f,0.0f,0.0f)) * glm::scale(glm::vec3(1.0f));
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x * 2.5f, sunColor.y * 2.5f, sunColor.z * 2.5f);
+	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x * 7.5f, sunColor.y * 7.5f, sunColor.z * 7.5f);
 	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
+
+	sunDir = glm::vec3(sunx, suny, sunz);
+
 	Core::DrawContext(models::sphere);
 }
 
@@ -305,7 +303,7 @@ void renderScene(GLFWwindow* window)
 	//skybox
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderSkybox(models::skybox, glm::translate(glm::scale(glm::mat4(), glm::vec3(4.0f)), glm::vec3(0.0f,2.0f,0.0f)), textures::skybox);
+	renderSkybox(models::skybox, glm::translate(glm::scale(glm::mat4(), glm::vec3(2.5f, 2.0f, 2.0f)), glm::vec3(3.0f,1.0f,0.0f)), textures::skybox);
 
 	//time and delta time
 	float time = glfwGetTime();
@@ -315,16 +313,16 @@ void renderScene(GLFWwindow* window)
 	renderShadowapSun();
 
 	//sun
-	renderSun(13);
+	renderSun();
 	
 	
 	//render structures
 	drawObjectPBR(models::ceiling, glm::mat4(), glm::vec3(), textures::ceiling, 0.8f, 0.0f, 10.0f);
-	drawObjectPBR(models::roof, glm::mat4(), glm::vec3(), textures::roof, 0.0f, 1.0f, 20.0f);
-	drawObjectPBR(models::floor, glm::mat4(), glm::vec3(), textures::floor, 1.0f, 1.0f, 15.0f);
+	drawObjectPBR(models::roof, glm::mat4(), glm::vec3(), textures::roof, 0.8f, 0.0f, 20.0f);
+	drawObjectPBR(models::floor, glm::mat4(), glm::vec3(), textures::floor, 0.8f, 0.0f, 15.0f);
 	drawObjectPBR(models::room, glm::mat4(), glm::vec3(), textures::room, 0.8f, 1.0f, 7.0f);
-	drawObjectPBR(models::ground, glm::mat4(), glm::vec3(), textures::ground, 1.0f, 1.0f, 30.0f);
-	drawObjectPBR(models::walls, glm::mat4(), glm::vec3(), textures::walls, 1.0f, 1.0f, 5.0f);
+	drawObjectPBR(models::ground, glm::mat4(), glm::vec3(), textures::ground, 0.8f, 0.0f, 30.0f);
+	drawObjectPBR(models::walls, glm::mat4(), glm::vec3(), textures::walls, 0.8f, 0.0f, 5.0f);
 
 	//render furnitures
 	drawObjectPBR(models::bed, glm::mat4(), glm::vec3(), textures::bed, 0.2f, 0.0f, 1.0f);
@@ -340,6 +338,30 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::smallWindow1, glm::mat4(), glm::vec3(5.0f, 5.0f, 5.0f), NULL, 0.2f, 0.0f, 1.0f);
 	drawObjectPBR(models::smallWindow2, glm::mat4(), glm::vec3(5.0f, 5.0f, 5.0f), NULL, 0.2f, 0.0f, 1.0f);
 	drawObjectPBR(models::painting, glm::mat4(), glm::vec3(), textures::painting, 0.0f, 0.0f, 3.0f);
+
+	//render environment
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f,0.0f,7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(7.5f, -0.3f, 4.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(10.0f, -0.5f, 1.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(7.0f, -0.3f, -3.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f, 0.0f, -8.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(0.3f, 0.0f, 8.4f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(1.3f, 0.0f, 13.4f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(10.6f, -0.5f, 14.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(15.1f, -0.7f, 8.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(20.8f, -1.0f, 2.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(16.3f, -0.7f, -7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(8.3f, -0.5f, -12.7f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::bush, glm::translate(glm::mat4(), glm::vec3(8.3f, 0.0f, -10.7f)), glm::vec3(), textures::bush, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::bush, glm::translate(glm::mat4(), glm::vec3(9.3f, 0.0f, -5.7f)), glm::vec3(), textures::bush, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::bush, glm::translate(glm::mat4(), glm::vec3(3.3f, 0.0f, -6.0f)), glm::vec3(), textures::bush, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::bush, glm::translate(glm::mat4(), glm::vec3(5.3f, 0.0f, 0.0f)), glm::vec3(), textures::bush, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::bush, glm::translate(glm::mat4(), glm::vec3(11.3f, 0.0f, 2.7f)), glm::vec3(), textures::bush, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::rock, glm::translate(glm::mat4(), glm::vec3(11.3f, 0.0f, -3.0f)), glm::vec3(), textures::rock, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::rock, glm::translate(glm::mat4(), glm::vec3(11.3f, 0.0f, -8.7f)), glm::vec3(), textures::rock, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::rock, glm::translate(glm::mat4(), glm::vec3(7.5f, 0.0f, -13.0f)), glm::vec3(), textures::rock, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::rock, glm::translate(glm::mat4(), glm::vec3(7.0f, 0.0f, -0.5f)), glm::vec3(), textures::rock, 0.0f, 0.0f, 5.0f);
+	drawObjectPBR(models::rock, glm::translate(glm::mat4(), glm::vec3(4.5f, 0.0f, -7.0f)), glm::vec3(), textures::rock, 0.0f, 0.0f, 5.0f);
 
 	//render and animate player
 	animatePlayer();
@@ -447,12 +469,36 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
 		exposition += 0.05;
 	}
+
+	//sunDir
+	//x
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) {
+		sunx += 1;
+	}
+	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) {
+		sunx -= 1;
+	}
+	//y
+	if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) {
+		suny += 1;
+	}
+	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) {
+		suny -= 1;
+	}
+	//z
+	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) {
+		sunz += 1;
+	}
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) {
+		sunz -= 1;
+	}
 		
 
 	// debug info
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
 		printf("spaceshipPos = glm::vec3(%ff, %ff, %ff);\n", playerPos.x, playerPos.y, playerPos.z);
 		printf("spaceshipDir = glm::vec3(%ff, %ff, %ff);\n", playerDir.x, playerDir.y, playerDir.z);
+		printf("sunDir = glm::vec3(%ff, %ff, %ff);\n\n", sunx, suny, sunz);
 	}
 }
 
