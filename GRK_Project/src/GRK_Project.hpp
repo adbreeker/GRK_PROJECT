@@ -289,12 +289,13 @@ void renderSkybox(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint te
 {
 	glDepthFunc(GL_LEQUAL);
 	glUseProgram(programSkybox);
-	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * glm::mat4(glm::mat3(createCameraMatrix()));
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	Core::SetActiveTexture(textureID, "skybox", programSkybox, 0);
 	Core::DrawContext(context);
 	glDepthFunc(GL_LESS);
+	glUseProgram(0);
 }
 
 //render scene --------------------------------------------------------------------------------- render scene
@@ -303,7 +304,8 @@ void renderScene(GLFWwindow* window)
 	//skybox
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderSkybox(models::skybox, glm::translate(glm::scale(glm::mat4(), glm::vec3(2.5f, 2.0f, 2.0f)), glm::vec3(3.0f,1.0f,0.0f)), textures::skybox);
+	renderSkybox(models::skybox, glm::translate(glm::scale(glm::mat4(), glm::vec3(2.5f, 2.0f, 2.0f)), glm::vec3(3.0f, 1.0f, 0.0f)), textures::skybox);
+
 
 	//time and delta time
 	float time = glfwGetTime();
