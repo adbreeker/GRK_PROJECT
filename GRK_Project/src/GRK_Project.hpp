@@ -18,7 +18,7 @@
 
 //window variables
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-int WIDTH = 800, HEIGHT = 800;
+int WIDTH = 1000, HEIGHT = 1000;
 
 //variables -------------------------------------------------------------------------------------------------------------------------------------------------------- variables
 
@@ -34,25 +34,27 @@ GLuint programSkybox;
 Core::Shader_Loader shaderLoader;
 
 //sun
-float sunx = -10.0f, suny = 2.0f, sunz = -5.0f;
+float sunx = 9.0f, suny = 4.0f, sunz = 2.0f;
 glm::vec3 sunDir = glm::vec3(sunx, suny, sunz);
+glm::vec3 sunPos = glm::vec3(-4.740971f, 2.149999f, 0.369280f);
 glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f);
 float sunForce = 5;
 
-//camera
-glm::vec3 cameraPos = glm::vec3(0.48f, 1.25f, -2.12f);
-glm::vec3 cameraDir = glm::vec3(-0.35f, 0.00f, 0.93f);
-
 //player
-glm::vec3 playerPos = glm::vec3(0.0f, 1.25f, -7.0f);
+glm::vec3 playerPos = glm::vec3(0.0f, 1.25f, -10.0f);
 glm::vec3 playerDir = glm::vec3(-0.0f, 0.00f, 1.0f);
+
+//camera
+glm::vec3 cameraStartPos = playerPos - 0.5 * playerDir + glm::vec3(0, 2, 0) * 0.2f;;
+glm::vec3 cameraPos = glm::vec3(cameraStartPos.x, cameraStartPos.y, cameraStartPos.z);
+glm::vec3 cameraDir = playerDir;
 
 //apsect and exposition
 float aspectRatio = 1.f;
 float exposition = 1.f;
 
 //pointlight (sun)
-glm::vec3 pointlightPos = glm::vec3(-17.0f, 10.0f, 0.0f);
+glm::vec3 pointlightPos = glm::vec3(5.0f, 20.0f, 8.0f);
 glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6);
 
 //spotlight (player)
@@ -138,6 +140,7 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 		program = programTex;
 	}
 
+
 	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
@@ -151,8 +154,9 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 	glUniform1f(glGetUniformLocation(program, "brightness"), brightness);
 
 	glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+	glUniform3f(glGetUniformLocation(program, "cameraStartPos"), cameraStartPos.x, cameraStartPos.y, cameraStartPos.z);
 
-	glUniform3f(glGetUniformLocation(program, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
+	glUniform3f(glGetUniformLocation(program, "sunDir"),  sunDir.x, sunDir.y, sunDir.z);
 	glUniform3f(glGetUniformLocation(program, "sunColor"), sunColor.x * sunForce/100, sunColor.y * sunForce/100, sunColor.z * sunForce/100);
 
 	glUniform3f(glGetUniformLocation(program, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
@@ -322,19 +326,19 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::ceiling, glm::mat4(), glm::vec3(), textures::ceiling, 0.8f, 0.0f, 10.0f);
 	drawObjectPBR(models::roof, glm::mat4(), glm::vec3(), textures::roof, 0.8f, 0.0f, 20.0f);
 	drawObjectPBR(models::floor, glm::mat4(), glm::vec3(), textures::floor, 0.8f, 0.0f, 15.0f);
-	drawObjectPBR(models::room, glm::mat4(), glm::vec3(), textures::room, 0.8f, 1.0f, 7.0f);
+	drawObjectPBR(models::room, glm::mat4(), glm::vec3(), textures::room, 0.8f, 0.0f, 7.0f);
 	drawObjectPBR(models::ground, glm::mat4(), glm::vec3(), textures::ground, 0.8f, 0.0f, 30.0f);
 	drawObjectPBR(models::walls, glm::mat4(), glm::vec3(), textures::walls, 0.8f, 0.0f, 5.0f);
 
 	//render furnitures
-	drawObjectPBR(models::bed, glm::mat4(), glm::vec3(), textures::bed, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::bed, glm::mat4(), glm::vec3(), textures::bed, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::chair, glm::mat4(), glm::vec3(), textures::chair, 0.4f, 0.0f, 1.0f);
-	drawObjectPBR(models::desk, glm::mat4(), glm::vec3(), textures::desk, 0.2f, 0.0f, 3.0f);
+	drawObjectPBR(models::desk, glm::mat4(), glm::vec3(), textures::desk, 0.2f, 0.0f, 5.0f);
 	animateDoor();
 	drawObjectPBR(models::jamb, glm::mat4(), glm::vec3(), textures::jamb, 0.2f, 0.0f, 3.0f);
-	drawObjectPBR(models::drawer, glm::mat4(), glm::vec3(), textures::drawer, 0.2f, 0.0f, 1.0f);
+	drawObjectPBR(models::drawer, glm::mat4(), glm::vec3(), textures::drawer, 0.2f, 0.0f, 5.0f);
 	drawObjectPBR(models::marbleBust, glm::mat4(), glm::vec3(), textures::marbleBust, 0.9f, 1.0f, 10.0f);
-	drawObjectPBR(models::mattress, glm::mat4(), glm::vec3(), textures::mattress, 0.8f, 0.0f, 1.0f);
+	drawObjectPBR(models::mattress, glm::mat4(), glm::vec3(), textures::mattress, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::pencils, glm::mat4(), glm::vec3(0.1f, 0.02f, 0.0f), textures::pencils, 0.0f, 0.0f, 3.0f);
 	drawObjectPBR(models::hugeWindow, glm::mat4(), glm::vec3(5.0f, 5.0f, 5.0f), NULL, 0.2f, 0.0f, 1.0f);
 	drawObjectPBR(models::smallWindow1, glm::mat4(), glm::vec3(5.0f, 5.0f, 5.0f), NULL, 0.2f, 0.0f, 1.0f);
@@ -504,6 +508,40 @@ void processInput(GLFWwindow* window)
 	}
 }
 
+//constrain movement  ------------------------------------------------------------------------------------------------------------------------------------ constrain movement
+void constrainMovement()
+{
+	//x pos
+	if (playerPos.x > 15.0f)
+	{
+		playerPos.x = 15.0f;
+	}
+	if (playerPos.x < -15.0f)
+	{
+		playerPos.x = -15.0f;
+	}
+
+	//y pos
+	if (playerPos.y > 12.0f)
+	{
+		playerPos.y = 12.0f;
+	}
+	if (playerPos.y < 0.0f)
+	{
+		playerPos.y = 0.0f;
+	}
+
+	//z pos
+	if (playerPos.z > 15.0f)
+	{
+		playerPos.z = 15.0f;
+	}
+	if (playerPos.z < -15.0f)
+	{
+		playerPos.z = -15.0f;
+	}
+
+}
 
 
 //main loop -------------------------------------------------------------------------------------------------------------------------------------------------------- main loop
@@ -511,7 +549,7 @@ void renderLoop(GLFWwindow* window) {
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
-
+		constrainMovement();
 		renderScene(window);
 		glfwPollEvents();
 	}

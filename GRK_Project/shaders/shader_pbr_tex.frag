@@ -6,6 +6,7 @@ float PI = 3.14;
 uniform sampler2D depthMap;
 
 uniform vec3 cameraPos;
+uniform vec3 cameraStartPos;
 
 uniform sampler2D colorTexture;
 
@@ -110,10 +111,10 @@ void main()
 
     //vec3 viewDir = normalize(viewDirTS);
     vec3 viewDir = normalize(cameraPos-worldPos);
+    vec3 viewDirSun = normalize(cameraStartPos - worldPos);
 
 	//vec3 lightDir = normalize(lightDirTS);
 	vec3 lightDir = normalize(lightPos-worldPos);
-
 
 
 	vec3 ambient = AMBIENT*color;
@@ -131,7 +132,7 @@ void main()
 	ilumination=ilumination+PBRLight(spotlightDir,attenuatedlightColor,normal,viewDir);
 
 	//sun
-	ilumination=ilumination+PBRLight(sunDir,sunColor,normal,viewDir);
+	ilumination=ilumination+PBRLight(sunDir,sunColor,normal,viewDirSun);
 
     
 	outColor = vec4(vec3(1.0) - exp(-ilumination*exposition),1);
