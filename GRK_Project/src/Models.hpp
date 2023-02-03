@@ -28,6 +28,11 @@ namespace models
 	Core::RenderContext mattress;
 	Core::RenderContext pencils;
 	Core::RenderContext painting;
+	Core::RenderContext carpet;
+	Core::RenderContext stool;
+	Core::RenderContext barbells;
+	Core::RenderContext mat;
+	Core::RenderContext poster;
 
 	//player
 	Core::RenderContext fly0;
@@ -71,6 +76,11 @@ namespace textures
 	GLuint mattress;
 	GLuint pencils;
 	GLuint painting;
+	GLuint carpet;
+	GLuint stool;
+	GLuint barbells;
+	GLuint mat;
+	GLuint poster;
 
 	//player
 	GLuint fly0;
@@ -113,6 +123,11 @@ namespace objects_paths
 	std::string mattress = "./models/furnitures/mattress";
 	std::string pencils = "./models/furnitures/pencils";
 	std::string painting = "./models/furnitures/painting";
+	std::string carpet = "./models/furnitures/carpet";
+	std::string stool = "./models/furnitures/stool";
+	std::string barbells = "./models/furnitures/barbells";
+	std::string mat = "./models/furnitures/mat";
+	std::string poster = "./models/furnitures/poster";
 
 	//player
 	std::string fly0 = "./models/player/fly0";
@@ -261,6 +276,11 @@ void loadAllModels()
 	loadModelToContext(objects_paths::smallWindow1, models::smallWindow1, textures::smallWindow1);
 	loadModelToContext(objects_paths::smallWindow2, models::smallWindow2, textures::smallWindow2);
 	loadModelToContext(objects_paths::painting, models::painting, textures::painting);
+	loadModelToContext(objects_paths::carpet, models::carpet, textures::carpet);
+	loadModelToContext(objects_paths::stool, models::stool, textures::stool);
+	loadModelToContext(objects_paths::barbells, models::barbells, textures::barbells);
+	loadModelToContext(objects_paths::mat, models::mat, textures::mat);
+	loadModelToContext(objects_paths::poster, models::poster, textures::poster);
 
 	//load player and his texture
 	loadModelToContext(objects_paths::fly0, models::fly0, textures::fly0);
