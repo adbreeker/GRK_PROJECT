@@ -5,6 +5,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <string>
+#include <Windows.h>
 
 #include "glew.h"
 #include "glm.hpp"
@@ -110,8 +111,8 @@ glm::mat4 createPerspectiveMatrix()
 	glm::mat4 perspectiveMatrix;
 	float n = 0.05;
 	float f = 20.;
-	float a1 = glm::min(aspectRatio, 1.f);
-	float a2 = glm::min(1 / aspectRatio, 1.f);
+	float a1 = min(aspectRatio, 1.f);
+	float a2 = min(1 / aspectRatio, 1.f);
 	perspectiveMatrix = glm::mat4({
 		1,0.,0.,0.,
 		0.,aspectRatio,0.,0.,
@@ -323,7 +324,7 @@ void renderScene(GLFWwindow* window)
 	
 	
 	//render structures
-	drawObjectPBR(models::ceiling, glm::mat4(), glm::vec3(), textures::ceiling, 0.8f, 0.0f, 10.0f);
+	drawObjectPBR(models::ceiling, glm::mat4(), glm::vec3(), textures::ceiling, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::roof, glm::mat4(), glm::vec3(), textures::roof, 0.8f, 0.0f, 20.0f);
 	drawObjectPBR(models::floor, glm::mat4(), glm::vec3(), textures::floor, 0.8f, 0.0f, 15.0f);
 	drawObjectPBR(models::room, glm::mat4(), glm::vec3(), textures::room, 0.8f, 0.0f, 7.0f);
@@ -332,7 +333,7 @@ void renderScene(GLFWwindow* window)
 
 	//render furnitures
 	drawObjectPBR(models::bed, glm::mat4(), glm::vec3(), textures::bed, 0.8f, 0.0f, 5.0f);
-	drawObjectPBR(models::chair, glm::mat4(), glm::vec3(), textures::chair, 0.4f, 0.0f, 1.0f);
+	drawObjectPBR(models::chair, glm::mat4(), glm::vec3(), textures::chair, 0.4f, 0.0f, 5.0f);
 	drawObjectPBR(models::desk, glm::mat4(), glm::vec3(), textures::desk, 0.2f, 0.0f, 5.0f);
 	animateDoor();
 	drawObjectPBR(models::jamb, glm::mat4(), glm::vec3(), textures::jamb, 0.2f, 0.0f, 3.0f);
@@ -344,6 +345,12 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::smallWindow1, glm::mat4(), glm::vec3(5.0f, 5.0f, 5.0f), NULL, 0.2f, 0.0f, 1.0f);
 	drawObjectPBR(models::smallWindow2, glm::mat4(), glm::vec3(5.0f, 5.0f, 5.0f), NULL, 0.2f, 0.0f, 1.0f);
 	drawObjectPBR(models::painting, glm::mat4(), glm::vec3(), textures::painting, 0.0f, 0.0f, 3.0f);
+	drawObjectPBR(models::carpet, glm::mat4(), glm::vec3(), textures::carpet, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::stool, glm::mat4(), glm::vec3(), textures::stool, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::stool, glm::translate(glm::mat4(), glm::vec3(-0.5f, 0, -0.5f)), glm::vec3(), textures::stool, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::barbells, glm::mat4(), glm::vec3(), textures::barbells, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::mat, glm::mat4(), glm::vec3(), textures::mat, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::poster, glm::mat4(), glm::vec3(), textures::poster, 0.8f, 0.0f, 5.0f);
 
 	//render environment
 	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f,0.0f,7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
@@ -403,6 +410,9 @@ void init(GLFWwindow* window)
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 	
 	loadAllModels();
+
+	PlaySound(TEXT("./sounds/backgroundSound.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	
 }
 
 
@@ -543,6 +553,16 @@ void constrainMovement()
 
 }
 
+//fps limiter --------------------------------------------------------------------------------------------------------------------------------------------------fps limiter
+void setMaxFPS(float fps)
+{
+	if (1 / deltaTime > fps)
+	{
+		float timeToDelay = 1 - (deltaTime * fps);
+		Sleep((timeToDelay * 1000)/fps);
+	}
+}
+
 
 //main loop -------------------------------------------------------------------------------------------------------------------------------------------------------- main loop
 void renderLoop(GLFWwindow* window) {
@@ -552,5 +572,7 @@ void renderLoop(GLFWwindow* window) {
 		constrainMovement();
 		renderScene(window);
 		glfwPollEvents();
+
+		setMaxFPS(75);
 	}
 }
