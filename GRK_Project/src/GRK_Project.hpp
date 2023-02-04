@@ -37,7 +37,7 @@ Core::Shader_Loader shaderLoader;
 //sun
 float sunx = 9.0f, suny = 4.0f, sunz = 2.0f;
 glm::vec3 sunDir = glm::vec3(sunx, suny, sunz);
-glm::vec3 sunPos = glm::vec3(-4.740971f, 2.149999f, 0.369280f);
+glm::vec3 sunPos = glm::vec3(5.0f, 20.0f, 8.0f);
 glm::vec3 sunColor = glm::vec3(0.9f, 0.9f, 0.7f);
 float sunForce = 5;
 
@@ -55,14 +55,14 @@ float aspectRatio = 1.f;
 float exposition = 1.f;
 
 //pointlight (sun)
-glm::vec3 pointlightPos = glm::vec3(5.0f, 20.0f, 8.0f);
-glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6);
+glm::vec3 pointlightPos = glm::vec3(0.0f, 2.0f, 0.0f);
+glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6)*4;
 
 //spotlight (player)
-glm::vec3 spotlightPos = glm::vec3(0, 0, 0);
-glm::vec3 spotlightConeDir = glm::vec3(0, 0, 0);
-glm::vec3 spotlightColor = glm::vec3(0.4, 0.4, 0.9)*3;
-float spotlightPhi = 3.14 / 4;
+glm::vec3 spotlightPos = glm::vec3(-3.21f, 1.3941f, 1.6343f);
+glm::vec3 spotlightConeDir = glm::vec3(0.35f, -0.7f, -0.95f);
+glm::vec3 spotlightColor = glm::vec3(0.4, 0.4, 0.7)*3;
+float spotlightPhi = 3.14 / 3;
 
 //player animation
 int animationState = 0;
@@ -280,7 +280,7 @@ void renderSun()
 {
 	glUseProgram(programSun);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
-	glm::mat4 transformation = viewProjectionMatrix * glm::translate(pointlightPos + glm::vec3(0.0f,0.0f,0.0f)) * glm::scale(glm::vec3(1.0f));
+	glm::mat4 transformation = viewProjectionMatrix * glm::translate(sunPos + glm::vec3(0.0f,0.0f,0.0f)) * glm::scale(glm::vec3(1.0f));
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x * 7.5f, sunColor.y * 7.5f, sunColor.z * 7.5f);
 	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
@@ -351,6 +351,7 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::barbells, glm::mat4(), glm::vec3(), textures::barbells, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::mat, glm::mat4(), glm::vec3(), textures::mat, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::poster, glm::mat4(), glm::vec3(), textures::poster, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::tableLamp, glm::mat4(), glm::vec3(), textures::tableLamp, 0.8f, 0.0f, 5.0f);
 
 	//render environment
 	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f,0.0f,7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
@@ -379,9 +380,6 @@ void renderScene(GLFWwindow* window)
 	//render and animate player
 	animatePlayer();
 
-	//update player light cone
-	spotlightPos = playerPos + 0.2 * playerDir;
-	spotlightConeDir = playerDir;
 
 	glfwSwapBuffers(window);
 }
@@ -489,24 +487,24 @@ void processInput(GLFWwindow* window)
 	//sunDir
 	//x
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) {
-		sunx += 1;
+		sunx += 0.01;
 	}
 	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) {
-		sunx -= 1;
+		sunx -= 0.01;
 	}
 	//y
 	if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) {
-		suny += 1;
+		suny += 0.01;
 	}
 	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) {
-		suny -= 1;
+		suny -= 0.01;
 	}
 	//z
 	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) {
-		sunz += 1;
+		sunz += 0.01;
 	}
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) {
-		sunz -= 1;
+		sunz -= 0.01;
 	}
 		
 
@@ -514,7 +512,8 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
 		printf("spaceshipPos = glm::vec3(%ff, %ff, %ff);\n", playerPos.x, playerPos.y, playerPos.z);
 		printf("spaceshipDir = glm::vec3(%ff, %ff, %ff);\n", playerDir.x, playerDir.y, playerDir.z);
-		printf("sunDir = glm::vec3(%ff, %ff, %ff);\n\n", sunx, suny, sunz);
+		printf("sunDir = glm::vec3(%ff, %ff, %ff);\n\n", spotlightPos.x, spotlightPos.y, spotlightPos.z);
+		printf("sunDir = glm::vec3(%ff, %ff, %ff);\n\n", spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
 	}
 }
 
