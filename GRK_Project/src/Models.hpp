@@ -33,6 +33,9 @@ namespace models
 	Core::RenderContext barbells;
 	Core::RenderContext mat;
 	Core::RenderContext poster;
+	Core::RenderContext tableLamp;
+	Core::RenderContext lamp;
+	Core::RenderContext switch_;
 
 	//player
 	Core::RenderContext fly0;
@@ -81,6 +84,9 @@ namespace textures
 	GLuint barbells;
 	GLuint mat;
 	GLuint poster;
+	GLuint tableLamp;
+	GLuint lamp;
+	GLuint switch_;
 
 	//player
 	GLuint fly0;
@@ -128,6 +134,10 @@ namespace objects_paths
 	std::string barbells = "./models/furnitures/barbells";
 	std::string mat = "./models/furnitures/mat";
 	std::string poster = "./models/furnitures/poster";
+	std::string tableLamp = "./models/furnitures/table_lamp";
+	std::string lamp = "./models/furnitures/lamp";
+	std::string switch_ = "./models/furnitures/switch";
+
 
 	//player
 	std::string fly0 = "./models/player/fly0";
@@ -281,6 +291,9 @@ void loadAllModels()
 	loadModelToContext(objects_paths::barbells, models::barbells, textures::barbells);
 	loadModelToContext(objects_paths::mat, models::mat, textures::mat);
 	loadModelToContext(objects_paths::poster, models::poster, textures::poster);
+	loadModelToContext(objects_paths::tableLamp, models::tableLamp, textures::tableLamp);
+	loadModelToContext(objects_paths::lamp, models::lamp, textures::lamp);
+	loadModelToContext(objects_paths::switch_, models::switch_, textures::switch_);
 
 	//load player and his texture
 	loadModelToContext(objects_paths::fly0, models::fly0, textures::fly0);
