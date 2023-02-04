@@ -54,14 +54,16 @@ glm::vec3 cameraDir = playerDir;
 float aspectRatio = 1.f;
 float exposition = 1.f;
 
-//pointlight (sun)
+//table lamp light
 glm::vec3 pointlightPos = glm::vec3(0.0f, 2.0f, 0.0f);
-glm::vec3 pointlightColor = glm::vec3(0.9, 0.6, 0.6)*4;
+glm::vec3 pointlightColorON = glm::vec3(0.9, 0.6, 0.6) * 4;
+glm::vec3 pointlightColor = pointlightColorON*0;
 
-//spotlight (player)
+//main lamp light
 glm::vec3 spotlightPos = glm::vec3(-3.21f, 1.3941f, 1.6343f);
 glm::vec3 spotlightConeDir = glm::vec3(0.35f, -0.7f, -0.95f);
-glm::vec3 spotlightColor = glm::vec3(0.4, 0.4, 0.7)*3;
+glm::vec3 spotlightColorON = glm::vec3(0.4, 0.4, 0.7)*3;
+glm::vec3 spotlightColor = spotlightColorON;
 float spotlightPhi = 3.14 / 3;
 
 //player animation
@@ -71,6 +73,10 @@ bool animationStateRising = true;
 //door animation
 float doorRotation=0.0f;
 bool animationStarted = false;
+
+//switch listener
+int switchDelay = 50;
+float mainLampRotation = 0;
 
 
 //delta time ------------------------------------------------------------------------------------------------------------------------------------------------------- delta time
@@ -85,6 +91,14 @@ void updateDeltaTime(float time) {
 	deltaTime = time - lastTime;
 	if (deltaTime > 0.1) deltaTime = 0.1;
 	lastTime = time;
+}
+
+glm::mat4 rotateAroundPivot(float degrees, glm::vec3 axis, glm::vec3 pivot)
+{
+	glm::mat4 to_pivot = glm::translate(glm::mat4(), -pivot);
+	glm::mat4 from_pivot = glm::translate(glm::mat4(), pivot);
+	glm::mat4 rotate = to_pivot * glm::rotate(glm::mat4(), glm::radians(degrees), axis) * from_pivot;
+	return rotate;
 }
 
 
@@ -251,9 +265,7 @@ void animateDoor()
 		doorRotation--;
 	}
 	glm::vec3 pivot = glm::vec3(0.411f, 0.957f, 4.628f);
-	glm::mat4 to_pivot = glm::translate(glm::mat4(), -pivot);
-	glm::mat4 from_pivot = glm::translate(glm::mat4(), pivot);
-	glm::mat4 rotate = to_pivot*glm::rotate(glm::mat4(), glm::radians(doorRotation), glm::vec3(0, 1, 0))*from_pivot;
+	glm::mat4 rotate = rotateAroundPivot(doorRotation, glm::vec3(0, 1, 0), pivot);
 	drawObjectPBR(models::door, glm::mat4()*rotate, glm::vec3(), textures::door, 0.9f, 0.0f, 3.0f);
 }
 
@@ -352,6 +364,8 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::mat, glm::mat4(), glm::vec3(), textures::mat, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::poster, glm::mat4(), glm::vec3(), textures::poster, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::tableLamp, glm::mat4(), glm::vec3(), textures::tableLamp, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::lamp, glm::mat4(), glm::vec3(), textures::lamp, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::switch_, glm::mat4() * rotateAroundPivot(mainLampRotation, glm::vec3(0,0,1), glm::vec3(-0.8f, -1.25f, -4.6f)), glm::vec3(0.95f, 0.95f, 0.85f), NULL, 0.8f, 0.0f, 5.0f);
 
 	//render environment
 	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f,0.0f,7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
@@ -552,6 +566,63 @@ void constrainMovement()
 
 }
 
+void switchListener()
+{
+	if (switchDelay < 50)
+	{
+		switchDelay++;
+	}
+
+
+	if (playerPos.y > 1.10f && playerPos.y < 1.40f)
+	{
+		if (playerPos.x > 0.7f && playerPos.x < 0.9f)
+		{
+			if (playerPos.z > -4.6f && playerPos.z < -4.4f)
+			{
+				if (switchDelay == 50)
+				{
+					switchDelay = 0;
+					if (mainLampRotation == 0)
+					{
+						mainLampRotation = 180;
+						pointlightColor = pointlightColorON;
+					}
+					else
+					{
+						mainLampRotation = 0;
+						pointlightColor *= 0;
+					}
+				}
+			}			
+		}
+	}
+
+
+	if (playerPos.y > 1.03f && playerPos.y < 1.18f)
+	{
+		if (playerPos.x > -3.35f && playerPos.x < -3.15f)
+		{
+			if (playerPos.z > 1.65f && playerPos.z < 1.85f)
+			{
+				if (switchDelay == 50)
+				{
+					switchDelay = 0;
+					if (spotlightColor == spotlightColorON)
+					{
+						spotlightColor *= 0;
+					}
+					else
+					{
+						spotlightColor = spotlightColorON;
+					}
+				}
+			}			
+		}
+	}
+	
+}
+
 //fps limiter --------------------------------------------------------------------------------------------------------------------------------------------------fps limiter
 void setMaxFPS(float fps)
 {
@@ -569,6 +640,9 @@ void renderLoop(GLFWwindow* window) {
 	{
 		processInput(window);
 		constrainMovement();
+
+		switchListener();
+
 		renderScene(window);
 		glfwPollEvents();
 
