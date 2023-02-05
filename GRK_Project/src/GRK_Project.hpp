@@ -375,6 +375,11 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::books, glm::translate(glm::mat4(), glm::vec3(-1.2f, -0.3f, 0.0f)), glm::vec3(), textures::books, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::book, glm::translate(glm::mat4(), glm::vec3(-0.8f, -1.40f, -0.55f)), glm::vec3(), textures::book, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::openBook, glm::mat4(), glm::vec3(), textures::openBook, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::dogBed, glm::mat4(), glm::vec3(), textures::dogBed, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::waterBowl, glm::mat4(), glm::vec3(), textures::waterBowl, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::foodBowl, glm::mat4(), glm::vec3(), textures::foodBowl, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::boneToy, glm::mat4(), glm::vec3(), textures::boneToy, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::tennisBall, glm::mat4(), glm::vec3(), textures::tennisBall, 0.8f, 0.0f, 5.0f);
 
 	//render environment
 	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f,0.0f,7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);

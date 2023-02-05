@@ -43,6 +43,11 @@ namespace models
 	Core::RenderContext books;
 	Core::RenderContext book;
 	Core::RenderContext openBook;
+	Core::RenderContext dogBed;
+	Core::RenderContext waterBowl;
+	Core::RenderContext foodBowl;
+	Core::RenderContext boneToy;
+	Core::RenderContext tennisBall;
 
 	//player
 	Core::RenderContext fly0;
@@ -101,6 +106,11 @@ namespace textures
 	GLuint books;
 	GLuint book;
 	GLuint openBook;
+	GLuint dogBed;
+	GLuint waterBowl;
+	GLuint foodBowl;
+	GLuint boneToy;
+	GLuint tennisBall;
 
 	//player
 	GLuint fly0;
@@ -158,6 +168,11 @@ namespace objects_paths
 	std::string books = "./models/furnitures/books";
 	std::string book = "./models/furnitures/book";
 	std::string openBook = "./models/furnitures/open_book";
+	std::string dogBed = "./models/furnitures/dog_bed";
+	std::string waterBowl = "./models/furnitures/water_bowl";
+	std::string foodBowl = "./models/furnitures/food_bowl";
+	std::string boneToy = "./models/furnitures/bone_toy";
+	std::string tennisBall = "./models/furnitures/tennis_ball";
 
 
 	//player
@@ -322,6 +337,11 @@ void loadAllModels()
 	loadModelToContext(objects_paths::books, models::books, textures::books);
 	loadModelToContext(objects_paths::book, models::book, textures::book);
 	loadModelToContext(objects_paths::openBook, models::openBook, textures::openBook);
+	loadModelToContext(objects_paths::dogBed, models::dogBed, textures::dogBed);
+	loadModelToContext(objects_paths::waterBowl, models::waterBowl, textures::waterBowl);
+	loadModelToContext(objects_paths::foodBowl, models::foodBowl, textures::foodBowl);
+	loadModelToContext(objects_paths::boneToy, models::boneToy, textures::boneToy);
+	loadModelToContext(objects_paths::tennisBall, models::tennisBall, textures::tennisBall);
 
 
 	//load player and his texture
