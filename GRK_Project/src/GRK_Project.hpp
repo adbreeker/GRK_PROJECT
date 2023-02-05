@@ -366,6 +366,15 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::tableLamp, glm::mat4(), glm::vec3(), textures::tableLamp, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::lamp, glm::mat4(), glm::vec3(), textures::lamp, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::switch_, glm::mat4() * rotateAroundPivot(mainLampRotation, glm::vec3(0,0,1), glm::vec3(-0.8f, -1.25f, -4.6f)), glm::vec3(0.95f, 0.95f, 0.85f), NULL, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::pillow1, glm::mat4(), glm::vec3(), textures::pillow1, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::pillow2, glm::mat4(), glm::vec3(), textures::pillow2, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::duvet, glm::mat4(), glm::vec3(), textures::duvet, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::shelf, glm::mat4(), glm::vec3(), textures::shelf, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::book, glm::mat4(), glm::vec3(), textures::book, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::shelf, glm::translate(glm::mat4(), glm::vec3(-1.2f, -0.3f, 0.0f)), glm::vec3(), textures::shelf, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::books, glm::translate(glm::mat4(), glm::vec3(-1.2f, -0.3f, 0.0f)), glm::vec3(), textures::books, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::book, glm::translate(glm::mat4(), glm::vec3(-0.8f, -1.40f, -0.55f)), glm::vec3(), textures::book, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::openBook, glm::mat4(), glm::vec3(), textures::openBook, 0.8f, 0.0f, 5.0f);
 
 	//render environment
 	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f,0.0f,7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);

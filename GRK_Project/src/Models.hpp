@@ -36,6 +36,13 @@ namespace models
 	Core::RenderContext tableLamp;
 	Core::RenderContext lamp;
 	Core::RenderContext switch_;
+	Core::RenderContext pillow1;
+	Core::RenderContext pillow2;
+	Core::RenderContext duvet;
+	Core::RenderContext shelf;
+	Core::RenderContext books;
+	Core::RenderContext book;
+	Core::RenderContext openBook;
 
 	//player
 	Core::RenderContext fly0;
@@ -87,6 +94,13 @@ namespace textures
 	GLuint tableLamp;
 	GLuint lamp;
 	GLuint switch_;
+	GLuint pillow1;
+	GLuint pillow2;
+	GLuint duvet;
+	GLuint shelf;
+	GLuint books;
+	GLuint book;
+	GLuint openBook;
 
 	//player
 	GLuint fly0;
@@ -137,6 +151,13 @@ namespace objects_paths
 	std::string tableLamp = "./models/furnitures/table_lamp";
 	std::string lamp = "./models/furnitures/lamp";
 	std::string switch_ = "./models/furnitures/switch";
+	std::string pillow1 = "./models/furnitures/pillow1";
+	std::string pillow2 = "./models/furnitures/pillow2";
+	std::string duvet = "./models/furnitures/duvet";
+	std::string shelf = "./models/furnitures/shelf";
+	std::string books = "./models/furnitures/books";
+	std::string book = "./models/furnitures/book";
+	std::string openBook = "./models/furnitures/open_book";
 
 
 	//player
@@ -294,6 +315,14 @@ void loadAllModels()
 	loadModelToContext(objects_paths::tableLamp, models::tableLamp, textures::tableLamp);
 	loadModelToContext(objects_paths::lamp, models::lamp, textures::lamp);
 	loadModelToContext(objects_paths::switch_, models::switch_, textures::switch_);
+	loadModelToContext(objects_paths::pillow1, models::pillow1, textures::pillow1);
+	loadModelToContext(objects_paths::pillow2, models::pillow2, textures::pillow2);
+	loadModelToContext(objects_paths::duvet, models::duvet, textures::duvet);
+	loadModelToContext(objects_paths::shelf, models::shelf, textures::shelf);
+	loadModelToContext(objects_paths::books, models::books, textures::books);
+	loadModelToContext(objects_paths::book, models::book, textures::book);
+	loadModelToContext(objects_paths::openBook, models::openBook, textures::openBook);
+
 
 	//load player and his texture
 	loadModelToContext(objects_paths::fly0, models::fly0, textures::fly0);
