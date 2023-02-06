@@ -73,6 +73,8 @@ bool animationStateRising = true;
 //door animation
 float doorRotation=0.0f;
 bool animationStarted = false;
+float dogTailRotation = -45.0f;
+bool doggTailRotationIncreasing = true;
 
 //switch listener
 int switchDelay = 50;
@@ -97,7 +99,7 @@ glm::mat4 rotateAroundPivot(float degrees, glm::vec3 axis, glm::vec3 pivot)
 {
 	glm::mat4 to_pivot = glm::translate(glm::mat4(), -pivot);
 	glm::mat4 from_pivot = glm::translate(glm::mat4(), pivot);
-	glm::mat4 rotate = to_pivot * glm::rotate(glm::mat4(), glm::radians(degrees), axis) * from_pivot;
+	glm::mat4 rotate = from_pivot * glm::rotate(glm::mat4(), glm::radians(degrees), axis) * to_pivot;
 	return rotate;
 }
 
@@ -264,9 +266,38 @@ void animateDoor()
 	{
 		doorRotation--;
 	}
-	glm::vec3 pivot = glm::vec3(0.411f, 0.957f, 4.628f);
+	glm::vec3 pivot = glm::vec3(-0.411f, 0.957f, -4.628f);
 	glm::mat4 rotate = rotateAroundPivot(doorRotation, glm::vec3(0, 1, 0), pivot);
 	drawObjectPBR(models::door, glm::mat4()*rotate, glm::vec3(), textures::door, 0.9f, 0.0f, 3.0f);
+}
+
+void animateTail()
+{
+	if (doggTailRotationIncreasing)
+	{
+		if (dogTailRotation >= 35.0f)
+		{
+			doggTailRotationIncreasing = false;
+		}
+		else
+		{
+			dogTailRotation += 4.5;
+		}
+	}
+	else
+	{
+		if (dogTailRotation <= -35.0f)
+		{
+			doggTailRotationIncreasing = true;
+		}
+		else
+		{
+			dogTailRotation -= 4.5;
+		}
+	}
+	glm::vec3 pivot = glm::vec3(-2.97f, 0.44f, -3.81f);
+	glm::mat4 rotate = rotateAroundPivot(dogTailRotation, glm::vec3(1, 0, 1), pivot);
+	drawObjectPBR(models::dogTail, glm::mat4()*rotate, glm::vec3(), textures::dogTail, 0.8f, 0.0f, 5.0f);
 }
 
 
@@ -365,7 +396,21 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::poster, glm::mat4(), glm::vec3(), textures::poster, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::tableLamp, glm::mat4(), glm::vec3(), textures::tableLamp, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::lamp, glm::mat4(), glm::vec3(), textures::lamp, 0.8f, 0.0f, 5.0f);
-	drawObjectPBR(models::switch_, glm::mat4() * rotateAroundPivot(mainLampRotation, glm::vec3(0,0,1), glm::vec3(-0.8f, -1.25f, -4.6f)), glm::vec3(0.95f, 0.95f, 0.85f), NULL, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::switch_, glm::mat4() * rotateAroundPivot(mainLampRotation, glm::vec3(0,0,1), glm::vec3(0.8f, 1.25f, -4.6f)), glm::vec3(0.95f, 0.95f, 0.85f), NULL, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::pillow1, glm::mat4(), glm::vec3(), textures::pillow1, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::pillow2, glm::mat4(), glm::vec3(), textures::pillow2, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::duvet, glm::mat4(), glm::vec3(), textures::duvet, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::shelf, glm::mat4(), glm::vec3(), textures::shelf, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::book, glm::mat4(), glm::vec3(), textures::book, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::shelf, glm::translate(glm::mat4(), glm::vec3(-1.2f, -0.3f, 0.0f)), glm::vec3(), textures::shelf, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::books, glm::translate(glm::mat4(), glm::vec3(-1.2f, -0.3f, 0.0f)), glm::vec3(), textures::books, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::book, glm::translate(glm::mat4(), glm::vec3(-0.8f, -1.40f, -0.55f)), glm::vec3(), textures::book, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::openBook, glm::mat4(), glm::vec3(), textures::openBook, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::dogBed, glm::mat4(), glm::vec3(), textures::dogBed, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::waterBowl, glm::mat4(), glm::vec3(), textures::waterBowl, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::foodBowl, glm::mat4(), glm::vec3(), textures::foodBowl, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::boneToy, glm::mat4(), glm::vec3(), textures::boneToy, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::tennisBall, glm::mat4(), glm::vec3(), textures::tennisBall, 0.8f, 0.0f, 5.0f);
 
 	//render environment
 	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f,0.0f,7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
@@ -390,7 +435,8 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::rock, glm::translate(glm::mat4(), glm::vec3(7.5f, 0.0f, -13.0f)), glm::vec3(), textures::rock, 0.0f, 0.0f, 5.0f);
 	drawObjectPBR(models::rock, glm::translate(glm::mat4(), glm::vec3(7.0f, 0.0f, -0.5f)), glm::vec3(), textures::rock, 0.0f, 0.0f, 5.0f);
 	drawObjectPBR(models::rock, glm::translate(glm::mat4(), glm::vec3(4.5f, 0.0f, -7.0f)), glm::vec3(), textures::rock, 0.0f, 0.0f, 5.0f);
-
+	drawObjectPBR(models::dog, glm::mat4(), glm::vec3(), textures::dog, 0.8f, 0.0f, 5.0f);
+	animateTail();
 	//render and animate player
 	animatePlayer();
 

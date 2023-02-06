@@ -36,6 +36,18 @@ namespace models
 	Core::RenderContext tableLamp;
 	Core::RenderContext lamp;
 	Core::RenderContext switch_;
+	Core::RenderContext pillow1;
+	Core::RenderContext pillow2;
+	Core::RenderContext duvet;
+	Core::RenderContext shelf;
+	Core::RenderContext books;
+	Core::RenderContext book;
+	Core::RenderContext openBook;
+	Core::RenderContext dogBed;
+	Core::RenderContext waterBowl;
+	Core::RenderContext foodBowl;
+	Core::RenderContext boneToy;
+	Core::RenderContext tennisBall;
 
 	//player
 	Core::RenderContext fly0;
@@ -49,6 +61,8 @@ namespace models
 	Core::RenderContext tree;
 	Core::RenderContext bush;
 	Core::RenderContext rock;
+	Core::RenderContext dog;
+	Core::RenderContext dogTail;
 
 }
 
@@ -87,6 +101,18 @@ namespace textures
 	GLuint tableLamp;
 	GLuint lamp;
 	GLuint switch_;
+	GLuint pillow1;
+	GLuint pillow2;
+	GLuint duvet;
+	GLuint shelf;
+	GLuint books;
+	GLuint book;
+	GLuint openBook;
+	GLuint dogBed;
+	GLuint waterBowl;
+	GLuint foodBowl;
+	GLuint boneToy;
+	GLuint tennisBall;
 
 	//player
 	GLuint fly0;
@@ -100,6 +126,8 @@ namespace textures
 	GLuint tree;
 	GLuint bush;
 	GLuint rock;
+	GLuint dog;
+	GLuint dogTail;
 }
 
 //paths ----------------------------------------------------------------------------------------------------------------------------------------------------------path
@@ -137,6 +165,18 @@ namespace objects_paths
 	std::string tableLamp = "./models/furnitures/table_lamp";
 	std::string lamp = "./models/furnitures/lamp";
 	std::string switch_ = "./models/furnitures/switch";
+	std::string pillow1 = "./models/furnitures/pillow1";
+	std::string pillow2 = "./models/furnitures/pillow2";
+	std::string duvet = "./models/furnitures/duvet";
+	std::string shelf = "./models/furnitures/shelf";
+	std::string books = "./models/furnitures/books";
+	std::string book = "./models/furnitures/book";
+	std::string openBook = "./models/furnitures/open_book";
+	std::string dogBed = "./models/furnitures/dog_bed";
+	std::string waterBowl = "./models/furnitures/water_bowl";
+	std::string foodBowl = "./models/furnitures/food_bowl";
+	std::string boneToy = "./models/furnitures/bone_toy";
+	std::string tennisBall = "./models/furnitures/tennis_ball";
 
 
 	//player
@@ -151,6 +191,8 @@ namespace objects_paths
 	std::string tree = "./models/environment/tree";
 	std::string bush = "./models/environment/bush";
 	std::string rock = "./models/environment/rock";
+	std::string dog = "./models/environment/dog";
+	std::string dogTail = "./models/environment/dog_tail";
 }
 
 //get certain element path ------------------------------------------------------------------------------------------------------------------ get certain element path
@@ -294,6 +336,19 @@ void loadAllModels()
 	loadModelToContext(objects_paths::tableLamp, models::tableLamp, textures::tableLamp);
 	loadModelToContext(objects_paths::lamp, models::lamp, textures::lamp);
 	loadModelToContext(objects_paths::switch_, models::switch_, textures::switch_);
+	loadModelToContext(objects_paths::pillow1, models::pillow1, textures::pillow1);
+	loadModelToContext(objects_paths::pillow2, models::pillow2, textures::pillow2);
+	loadModelToContext(objects_paths::duvet, models::duvet, textures::duvet);
+	loadModelToContext(objects_paths::shelf, models::shelf, textures::shelf);
+	loadModelToContext(objects_paths::books, models::books, textures::books);
+	loadModelToContext(objects_paths::book, models::book, textures::book);
+	loadModelToContext(objects_paths::openBook, models::openBook, textures::openBook);
+	loadModelToContext(objects_paths::dogBed, models::dogBed, textures::dogBed);
+	loadModelToContext(objects_paths::waterBowl, models::waterBowl, textures::waterBowl);
+	loadModelToContext(objects_paths::foodBowl, models::foodBowl, textures::foodBowl);
+	loadModelToContext(objects_paths::boneToy, models::boneToy, textures::boneToy);
+	loadModelToContext(objects_paths::tennisBall, models::tennisBall, textures::tennisBall);
+
 
 	//load player and his texture
 	loadModelToContext(objects_paths::fly0, models::fly0, textures::fly0);
@@ -310,4 +365,6 @@ void loadAllModels()
 	loadModelToContext(objects_paths::tree, models::tree, textures::tree);
 	loadModelToContext(objects_paths::bush, models::bush, textures::bush);
 	loadModelToContext(objects_paths::rock, models::rock, textures::rock);
+	loadModelToContext(objects_paths::dog, models::dog, textures::dog);
+	loadModelToContext(objects_paths::dogTail, models::dogTail, textures::dogTail);
 }
