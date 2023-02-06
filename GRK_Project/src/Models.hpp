@@ -61,6 +61,8 @@ namespace models
 	Core::RenderContext tree;
 	Core::RenderContext bush;
 	Core::RenderContext rock;
+	Core::RenderContext dog;
+	Core::RenderContext dogTail;
 
 }
 
@@ -124,6 +126,8 @@ namespace textures
 	GLuint tree;
 	GLuint bush;
 	GLuint rock;
+	GLuint dog;
+	GLuint dogTail;
 }
 
 //paths ----------------------------------------------------------------------------------------------------------------------------------------------------------path
@@ -187,6 +191,8 @@ namespace objects_paths
 	std::string tree = "./models/environment/tree";
 	std::string bush = "./models/environment/bush";
 	std::string rock = "./models/environment/rock";
+	std::string dog = "./models/environment/dog";
+	std::string dogTail = "./models/environment/dog_tail";
 }
 
 //get certain element path ------------------------------------------------------------------------------------------------------------------ get certain element path
@@ -359,4 +365,6 @@ void loadAllModels()
 	loadModelToContext(objects_paths::tree, models::tree, textures::tree);
 	loadModelToContext(objects_paths::bush, models::bush, textures::bush);
 	loadModelToContext(objects_paths::rock, models::rock, textures::rock);
+	loadModelToContext(objects_paths::dog, models::dog, textures::dog);
+	loadModelToContext(objects_paths::dogTail, models::dogTail, textures::dogTail);
 }
