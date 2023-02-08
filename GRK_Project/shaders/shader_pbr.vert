@@ -8,6 +8,8 @@ layout(location = 4) in vec3 vertexBitangent;
 
 uniform mat4 transformation;
 uniform mat4 modelMatrix;
+uniform mat4 sunVP;
+uniform mat4 tableLightVP;
 
 out vec3 vecNormal;
 out vec3 worldPos;
@@ -19,11 +21,15 @@ uniform vec3 sunDir;
 
 out vec3 viewDirTS;
 out vec3 lightDirTS;
+out vec4 sunSpacePos;
+out vec4 tableLightSpacePos;
 out vec3 spotlightDirTS;
 out vec3 sunDirTS;
 
 void main()
 {
+	sunSpacePos = sunVP*modelMatrix*vec4(vertexPosition,1);
+	tableLightSpacePos = tableLightVP*modelMatrix*vec4(vertexPosition,1);
 	worldPos = (modelMatrix* vec4(vertexPosition,1)).xyz;
 	vecNormal = (modelMatrix* vec4(vertexNormal,0)).xyz;
 	gl_Position = transformation * vec4(vertexPosition, 1.0);

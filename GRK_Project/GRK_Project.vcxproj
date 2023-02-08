@@ -31,6 +31,7 @@
     <ClInclude Include="src\objload.h" />
     <ClInclude Include="src\Render_Utils.h" />
     <ClInclude Include="src\Shader_Loader.h" />
+    <ClInclude Include="src\Shadows.hpp" />
     <ClInclude Include="src\SOIL\image_DXT.h" />
     <ClInclude Include="src\SOIL\image_helper.h" />
     <ClInclude Include="src\SOIL\SOIL.h" />
@@ -44,6 +45,8 @@
     <None Include="shaders\shader_pbr.vert" />
     <None Include="shaders\shader_pbr_tex.frag" />
     <None Include="shaders\shader_pbr_tex.vert" />
+    <None Include="shaders\shader_shadow.frag" />
+    <None Include="shaders\shader_shadow.vert" />
     <None Include="shaders\shader_skybox.frag" />
     <None Include="shaders\shader_skybox.vert" />
     <None Include="shaders\shader_sun.frag" />
@@ -64,7 +67,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

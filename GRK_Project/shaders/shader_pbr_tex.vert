@@ -8,6 +8,8 @@ layout(location = 4) in vec3 vertexBitangent;
 
 uniform mat4 transformation;
 uniform mat4 modelMatrix;
+uniform mat4 sunVP;
+uniform mat4 tableLightVP;
 
 out vec3 vecNormal;
 out vec3 worldPos;
@@ -22,9 +24,14 @@ out vec3 lightDirTS;
 out vec3 spotlightDirTS;
 out vec3 sunDirTS;
 out vec2 vecTex;
+out vec4 sunSpacePos;
+out vec4 tableLightSpacePos;
 
 void main()
 {
+	sunSpacePos = sunVP*modelMatrix*vec4(vertexPosition,1);
+	tableLightSpacePos = tableLightVP*modelMatrix*vec4(vertexPosition,1);
+
 	vecTex = vertexTexCoord;
 	vecTex.y = 1.0 - vecTex.y;
 	
