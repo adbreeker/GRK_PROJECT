@@ -16,6 +16,7 @@
 #include "Box.cpp"
 #include "SOIL/SOIL.h"
 #include "Models.hpp"
+#include "Shadows.hpp"
 
 //window variables
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
@@ -24,14 +25,17 @@ int WIDTH = 1000, HEIGHT = 1000;
 //variables -------------------------------------------------------------------------------------------------------------------------------------------------------- variables
 
 //depht
-GLuint depthMapFBO;
-GLuint depthMap;
+GLuint depthMapSunFBO;
+GLuint depthMapSun;
+GLuint depthMapTableLightFBO;
+GLuint depthMapTableLight;
 
 //shaders
 GLuint programPBR;
 GLuint programTex;
 GLuint programSun;
 GLuint programSkybox;
+GLuint programDepth;
 Core::Shader_Loader shaderLoader;
 
 //sun
@@ -54,12 +58,12 @@ glm::vec3 cameraDir = playerDir;
 float aspectRatio = 1.f;
 float exposition = 1.f;
 
-//table lamp light
+//main lamp light
 glm::vec3 pointlightPos = glm::vec3(0.0f, 2.0f, 0.0f);
 glm::vec3 pointlightColorON = glm::vec3(0.9, 0.6, 0.6) * 4;
 glm::vec3 pointlightColor = pointlightColorON*0;
 
-//main lamp light
+//table lamp light
 glm::vec3 spotlightPos = glm::vec3(-3.21f, 1.3941f, 1.6343f);
 glm::vec3 spotlightConeDir = glm::vec3(0.35f, -0.7f, -0.95f);
 glm::vec3 spotlightColorON = glm::vec3(0.4, 0.4, 0.7)*3;
@@ -79,6 +83,10 @@ bool doggTailRotationIncreasing = true;
 //switch listener
 int switchDelay = 50;
 float mainLampRotation = 0;
+
+//projections for shadows
+glm::mat4 sunVP = glm::ortho(-25.f, 25.f, -25.f, 25.f, 1.0f, 80.0f) * glm::lookAt(sunPos, sunPos - sunDir, glm::vec3(0,1,0));
+glm::mat4 tableLightVP = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f) * glm::lookAt(spotlightPos, spotlightPos - spotlightConeDir, glm::vec3(0,1,0));
 
 
 //delta time ------------------------------------------------------------------------------------------------------------------------------------------------------- delta time
@@ -157,8 +165,17 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 		program = programTex;
 	}
 
-
 	glUseProgram(program);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, depthMapTableLight);
+	glUniformMatrix4fv(glGetUniformLocation(program, "tableLightVP"), 1, GL_FALSE, (float*)&tableLightVP);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, depthMapSun);
+	glUniformMatrix4fv(glGetUniformLocation(program, "sunVP"), 1, GL_FALSE, (float*)&sunVP);
+
+
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
@@ -301,23 +318,6 @@ void animateTail()
 }
 
 
-//render shadow ----------------------------------------------------------------------------------------------------------------------------------------------- render shadow
-void renderShadowapSun()
-{
-	float time = glfwGetTime();
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	//uzupelnij o renderowanie glebokosci do tekstury
-	// 
-	//		/\
-	//		||
-	// 
-	//coś z ostatnich zajęć, przy odrobinie szczęścia ktoś to ogarnie zanim zauważy to prowadzący xd
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, WIDTH, HEIGHT);
-}
-
-
 //render scene objects ----------------------------------------------------------------------------------------------------------------------------------- render scene objects
 void renderSun()
 {
@@ -346,9 +346,96 @@ void renderSkybox(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint te
 	glUseProgram(0);
 }
 
+void renderShadows(GLuint program, GLuint FBO, glm::mat4 VP) {
+
+	float time = glfwGetTime();
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(program);
+
+	//render structures
+	drawObjectDepth(program, models::ceiling, VP, glm::mat4());
+	drawObjectDepth(program, models::roof, VP, glm::mat4());
+	drawObjectDepth(program, models::floor, VP, glm::mat4());
+	drawObjectDepth(program, models::room, VP, glm::mat4());
+	drawObjectDepth(program, models::ground, VP, glm::mat4());
+	drawObjectDepth(program, models::walls, VP, glm::mat4());
+
+	//render furnitures
+	drawObjectDepth(program, models::bed, VP, glm::mat4());
+	drawObjectDepth(program, models::chair, VP, glm::mat4());
+	drawObjectDepth(program, models::desk, VP, glm::mat4());
+	drawObjectDepth(program, models::jamb, VP, glm::mat4());
+	drawObjectDepth(program, models::drawer, VP, glm::mat4());
+	drawObjectDepth(program, models::marbleBust, VP, glm::mat4());
+	drawObjectDepth(program, models::mattress, VP, glm::mat4());
+	drawObjectDepth(program, models::pencils, VP, glm::mat4());
+	drawObjectDepth(program, models::hugeWindow, VP, glm::mat4());
+	drawObjectDepth(program, models::smallWindow1, VP, glm::mat4());
+	drawObjectDepth(program, models::smallWindow2, VP, glm::mat4());
+	drawObjectDepth(program, models::painting, VP, glm::mat4());
+	drawObjectDepth(program, models::carpet, VP, glm::mat4());
+	drawObjectDepth(program, models::stool, VP, glm::mat4());
+	drawObjectDepth(program, models::stool, VP, glm::translate(glm::mat4(), glm::vec3(-0.5f, 0, -0.5f)));
+	drawObjectDepth(program, models::barbells, VP, glm::mat4());
+	drawObjectDepth(program, models::mat, VP, glm::mat4());
+	drawObjectDepth(program, models::poster, VP, glm::mat4());
+	drawObjectDepth(program, models::tableLamp, VP, glm::mat4());
+	drawObjectDepth(program, models::lamp, VP, glm::mat4());
+	drawObjectDepth(program, models::switch_, VP, glm::mat4() * rotateAroundPivot(mainLampRotation, glm::vec3(0, 0, 1), glm::vec3(0.8f, 1.25f, -4.6f)));
+	drawObjectDepth(program, models::pillow1, VP, glm::mat4());
+	drawObjectDepth(program, models::pillow2, VP, glm::mat4());
+	drawObjectDepth(program, models::duvet, VP, glm::mat4());
+	drawObjectDepth(program, models::shelf, VP, glm::mat4());
+	drawObjectDepth(program, models::book, VP, glm::mat4());
+	drawObjectDepth(program, models::shelf, VP, glm::translate(glm::mat4(), glm::vec3(-1.2f, -0.3f, 0.0f)));
+	drawObjectDepth(program, models::books, VP, glm::translate(glm::mat4(), glm::vec3(-1.2f, -0.3f, 0.0f)));
+	drawObjectDepth(program, models::book, VP, glm::translate(glm::mat4(), glm::vec3(-0.8f, -1.40f, -0.55f)));
+	drawObjectDepth(program, models::openBook, VP, glm::mat4());
+	drawObjectDepth(program, models::dogBed, VP, glm::mat4());
+	drawObjectDepth(program, models::waterBowl, VP, glm::mat4());
+	drawObjectDepth(program, models::foodBowl, VP, glm::mat4());
+	drawObjectDepth(program, models::boneToy, VP, glm::mat4());
+	drawObjectDepth(program, models::tennisBall, VP, glm::mat4());
+
+	//render environment
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(5.3f, 0.0f, 7.0f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(7.5f, -0.3f, 4.0f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(10.0f, -0.5f, 1.0f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(7.0f, -0.3f, -3.0f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(5.3f, 0.0f, -8.0f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(0.3f, 0.0f, 8.4f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(1.3f, 0.0f, 13.4f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(10.6f, -0.5f, 14.0f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(15.1f, -0.7f, 8.0f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(20.8f, -1.0f, 2.0f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(16.3f, -0.7f, -7.0f)));
+	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(8.3f, -0.5f, -12.7f)));
+	drawObjectDepth(program, models::bush, VP, glm::translate(glm::mat4(), glm::vec3(8.3f, 0.0f, -10.7f)));
+	drawObjectDepth(program, models::bush, VP, glm::translate(glm::mat4(), glm::vec3(9.3f, 0.0f, -5.7f)));
+	drawObjectDepth(program, models::bush, VP, glm::translate(glm::mat4(), glm::vec3(3.3f, 0.0f, -6.0f)));
+	drawObjectDepth(program, models::bush, VP, glm::translate(glm::mat4(), glm::vec3(5.3f, 0.0f, 0.0f)));
+	drawObjectDepth(program, models::bush, VP, glm::translate(glm::mat4(), glm::vec3(11.3f, 0.0f, 2.7f)));
+	drawObjectDepth(program, models::rock, VP, glm::translate(glm::mat4(), glm::vec3(11.3f, 0.0f, -3.0f)));
+	drawObjectDepth(program, models::rock, VP, glm::translate(glm::mat4(), glm::vec3(11.3f, 0.0f, -8.7f)));
+	drawObjectDepth(program, models::rock, VP, glm::translate(glm::mat4(), glm::vec3(7.5f, 0.0f, -13.0f)));
+	drawObjectDepth(program, models::rock, VP, glm::translate(glm::mat4(), glm::vec3(7.0f, 0.0f, -0.5f)));
+	drawObjectDepth(program, models::rock, VP, glm::translate(glm::mat4(), glm::vec3(4.5f, 0.0f, -7.0f)));
+	drawObjectDepth(program, models::dog, VP, glm::mat4());
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, WIDTH, HEIGHT);
+}
+
 //render scene --------------------------------------------------------------------------------- render scene
 void renderScene(GLFWwindow* window)
 {
+	//shadows
+	renderShadows(programDepth, depthMapSunFBO, sunVP);
+	renderShadows(programDepth, depthMapTableLightFBO, tableLightVP);
+
 	//skybox
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -358,9 +445,6 @@ void renderScene(GLFWwindow* window)
 	//time and delta time
 	float time = glfwGetTime();
 	updateDeltaTime(time);
-
-	//shadow
-	renderShadowapSun();
 
 	//sun
 	renderSun();
@@ -440,7 +524,6 @@ void renderScene(GLFWwindow* window)
 	//render and animate player
 	animatePlayer();
 
-
 	glfwSwapBuffers(window);
 }
 
@@ -466,8 +549,13 @@ void init(GLFWwindow* window)
 	programTex = shaderLoader.CreateProgram("shaders/shader_pbr_tex.vert", "shaders/shader_pbr_tex.frag");
 	programSun = shaderLoader.CreateProgram("shaders/shader_sun.vert", "shaders/shader_sun.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
-	
+	programDepth = shaderLoader.CreateProgram("shaders/shader_shadow.vert", "shaders/shader_shadow.frag");
+
 	loadAllModels();
+
+	//init depth maps
+	initDepthMap(depthMapSun, depthMapSunFBO);
+	initDepthMap(depthMapTableLight, depthMapTableLightFBO);
 
 	PlaySound(TEXT("./sounds/backgroundSound.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	

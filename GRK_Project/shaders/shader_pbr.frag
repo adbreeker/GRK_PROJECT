@@ -3,7 +3,8 @@
 float AMBIENT = 0.03;
 float PI = 3.14;
 
-uniform sampler2D depthMap;
+uniform sampler2D depthMapSun;
+uniform sampler2D depthMapTableLight;
 
 uniform vec3 cameraPos;
 
@@ -36,10 +37,36 @@ in vec3 viewDirTS;
 in vec3 lightDirTS;
 in vec3 spotlightDirTS;
 in vec3 sunDirTS;
+in vec4 sunSpacePos;
+in vec4 tableLightSpacePos;
 
 in vec3 test;
 
 vec3 colorB = color * brightness;
+
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 dir, sampler2D shadowMap){
+    float shadow = 0.0f;
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+
+    if (projCoords.z <= 1.0f){
+         projCoords = projCoords * 0.5 + 0.5;
+         float currentDepth = projCoords.z;
+         float bias = max(0.025f * (1.0f - dot(normal, dir)), 0.0005f);
+         
+         int sampleRadius = 2;
+         vec2 pixelSize = 1.0 / textureSize(shadowMap, 0);
+         for (int y = -sampleRadius; y <= sampleRadius; y++){
+            for (int x = -sampleRadius; x <= sampleRadius; x++){
+                float closestDepth = texture(shadowMap, projCoords.xy + vec2(x,y) * pixelSize).r;
+                if (currentDepth > closestDepth + bias){
+                    shadow += 1.0f;
+                }
+            }
+         }
+         shadow /= pow((sampleRadius*2 + 1), 2);
+    }
+     return shadow;
+}
 
 float DistributionGGX(vec3 normal, vec3 H, float roughness){
     float a      = roughness*roughness;
@@ -113,7 +140,7 @@ void main()
 	//vec3 lightDir = normalize(lightDirTS);
 	vec3 lightDir = normalize(lightPos-worldPos);
 
-
+    //table light
 	vec3 ambient = AMBIENT*colorB;
 	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2);
 	vec3 ilumination;
@@ -123,13 +150,14 @@ void main()
 	//vec3 spotlightDir= normalize(spotlightDirTS);
 	vec3 spotlightDir= normalize(spotlightPos-worldPos);
 	
-
+    float shadowTableLight = ShadowCalculation(tableLightSpacePos, normal, spotlightConeDir, depthMapTableLight);
     float angle_atenuation = clamp((dot(-normalize(spotlightPos-worldPos),spotlightConeDir)-0.5)*3,0,1);
 	attenuatedlightColor = angle_atenuation*spotlightColor/pow(length(spotlightPos-worldPos),2);
-	ilumination=ilumination+PBRLight(spotlightDir,attenuatedlightColor,normal,viewDir);
+	ilumination=ilumination+PBRLight(spotlightDir,shadowTableLight*attenuatedlightColor,normal,viewDir);
 
 	//sun
-	ilumination=ilumination+PBRLight(sunDir,sunColor,normal,viewDir);
+    float shadowSun = ShadowCalculation(sunSpacePos, normal, sunDir, depthMapSun);
+	ilumination=ilumination+PBRLight(sunDir,shadowSun*sunColor,normal,viewDir);
 
     
 	outColor = vec4(vec3(1.0) - exp(-ilumination*exposition),1);
