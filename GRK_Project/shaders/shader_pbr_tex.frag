@@ -153,7 +153,7 @@ void main()
 	vec3 spotlightDir= normalize(spotlightPos-worldPos);
 	
     //table light
-    float shadowTableLight = ShadowCalculation(tableLightSpacePos, normal, spotlightConeDir, depthMapTableLight);
+    float shadowTableLight = ShadowCalculation(tableLightSpacePos, normal, spotlightDir, depthMapTableLight);
     float angle_atenuation = clamp((dot(-normalize(spotlightPos-worldPos),spotlightConeDir)-0.5)*3,0,1);
 	attenuatedlightColor = angle_atenuation*spotlightColor/pow(length(spotlightPos-worldPos),2);
 	ilumination=ilumination+PBRLight(spotlightDir,shadowTableLight*attenuatedlightColor,normal,viewDir);
