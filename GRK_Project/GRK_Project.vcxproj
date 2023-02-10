@@ -51,6 +51,8 @@
     <None Include="shaders\shader_skybox.vert" />
     <None Include="shaders\shader_sun.frag" />
     <None Include="shaders\shader_sun.vert" />
+    <None Include="shader_lightLamp.frag" />
+    <None Include="shader_lightLamp.vert" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GRK_Project.rc" />
@@ -67,7 +69,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

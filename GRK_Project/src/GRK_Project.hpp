@@ -36,6 +36,7 @@ GLuint programTex;
 GLuint programSun;
 GLuint programSkybox;
 GLuint programDepth;
+GLuint programLightPos;
 Core::Shader_Loader shaderLoader;
 
 //sun
@@ -62,6 +63,9 @@ float exposition = 1.f;
 glm::vec3 pointlightPos = glm::vec3(0.0f, 2.0f, 0.0f);
 glm::vec3 pointlightColorON = glm::vec3(0.9, 0.6, 0.6) * 4;
 glm::vec3 pointlightColor = pointlightColorON*0;
+//dodałem to Bartek
+glm::vec3 pointlightDiffuse = glm::vec3(0.8f, 0.8f, 0.8);
+glm::vec3 pointlightSpecular = glm::vec3(1.0f, 1.0f, 1.0f);
 
 //table lamp light
 glm::vec3 spotlightPos = glm::vec3(-3.21f, 1.3941f, 1.6343f);
@@ -333,6 +337,32 @@ void renderSun()
 	Core::DrawContext(models::sphere);
 }
 
+
+//ligh point  tutaj my Bartek
+void renderLightPoint() {
+
+	glUseProgram(programLightPos);
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 view = createCameraMatrix();
+	glm::mat4 projection = createPerspectiveMatrix();
+	glm::mat4 transformation = projection * view * model;
+
+	glUniformMatrix4fv(glGetUniformLocation(programLightPos, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(programLightPos, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(programLightPos, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+	// Pass light data to the shaders
+	glUniform3f(glGetUniformLocation(programLightPos, "lightPos"), pointlightPos.x, pointlightPos.y, pointlightPos.z);
+	glUniform3f(glGetUniformLocation(programLightPos, "lightAmbient"), pointlightColor.x, pointlightColor.y, pointlightColor.z);
+	glUniform3f(glGetUniformLocation(programLightPos, "lightDiffuse"), pointlightDiffuse.x, pointlightDiffuse.y, pointlightDiffuse.z);
+	glUniform3f(glGetUniformLocation(programLightPos, "lightSpecular"), pointlightSpecular.x, pointlightSpecular.y, pointlightSpecular.z);
+
+	// Pass view position to the shaders
+	glUniform3f(glGetUniformLocation(programLightPos, "viewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+	Core::DrawContext(models::lamp);
+
+}
+
 void renderSkybox(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint textureID)
 {
 	glDepthFunc(GL_LEQUAL);
@@ -449,6 +479,9 @@ void renderScene(GLFWwindow* window)
 	//sun
 	renderSun();
 	
+
+	//render light lamp
+	renderLightPoint();
 	
 	//render structures
 	drawObjectPBR(models::ceiling, glm::mat4(), glm::vec3(), textures::ceiling, 0.8f, 0.0f, 5.0f);
@@ -550,6 +583,8 @@ void init(GLFWwindow* window)
 	programSun = shaderLoader.CreateProgram("shaders/shader_sun.vert", "shaders/shader_sun.frag");
 	programSkybox = shaderLoader.CreateProgram("shaders/shader_skybox.vert", "shaders/shader_skybox.frag");
 	programDepth = shaderLoader.CreateProgram("shaders/shader_shadow.vert", "shaders/shader_shadow.frag");
+	// tutaj działamy Bartek
+	programLightPos = shaderLoader.CreateProgram("shaders/shader_lightLamp.vert", "shaders/shader_lightLamp.frag");
 
 	loadAllModels();
 
@@ -569,6 +604,8 @@ void shutdown(GLFWwindow* window)
 	shaderLoader.DeleteProgram(programTex);
 	shaderLoader.DeleteProgram(programSun);
 	shaderLoader.DeleteProgram(programSkybox);
+	//to dodałem Bartek
+	shaderLoader.DeleteProgram(programLightPos);
 }
 
 
