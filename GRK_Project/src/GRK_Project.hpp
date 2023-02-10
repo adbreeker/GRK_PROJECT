@@ -325,8 +325,20 @@ void renderSun()
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * glm::translate(sunPos + glm::vec3(0.0f,0.0f,0.0f)) * glm::scale(glm::vec3(1.0f));
 	glUniformMatrix4fv(glGetUniformLocation(programSun, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniform3f(glGetUniformLocation(programSun, "color"), sunColor.x * 7.5f, sunColor.y * 7.5f, sunColor.z * 7.5f);
-	glUniform1f(glGetUniformLocation(programSun, "exposition"), exposition);
+	glUniform3f(glGetUniformLocation(programSun, "viewPos"), playerPos.x, playerPos.y, playerPos.z);
+	glUniform3f(glGetUniformLocation(programSun, "sunPos"), sunPos.x, sunPos.y, sunPos.z);
+	glUniform1f(glGetUniformLocation(programSun, "viewSamples"),16);
+	glUniform1f(glGetUniformLocation(programSun, "lightSamples"),8);
+	glUniform1f(glGetUniformLocation(programSun, "I_sun"),8);
+	glUniform1f(glGetUniformLocation(programSun, "R_e"),6360);
+	glUniform1f(glGetUniformLocation(programSun, "R_a"),6420);
+	glUniform3f(glGetUniformLocation(programSun, "beta_R"), 5.8e-3f, 13.5e-3f, 33.1e-3f);
+	glUniform1f(glGetUniformLocation(programSun, "beta_M"), 21e-3f);
+	glUniform1f(glGetUniformLocation(programSun, "H_R"), 7.994);
+	glUniform1f(glGetUniformLocation(programSun, "H_M"), 1.200);
+	glUniform1f(glGetUniformLocation(programSun, "g"), 0.888);
+	glUniform1f(glGetUniformLocation(programSun, "toneMappingFactor"), 1.0);
+
 
 	sunDir = glm::vec3(sunx, suny, sunz);
 
