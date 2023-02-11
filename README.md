@@ -1,6 +1,12 @@
 # GRK_PROJECT
-Documentation:
 
+<!-- TABLE OF CONTENTS -->
+## Table of Contents
+* [Project description](#description)
+* [Link to tasks documentation](#tasks-documentation)
+
+<!-- Project description -->
+## Description
 All scene models are in ./GRK_Project/models/{model category}/{model name} here you have {model name}.obj and optionaly {model name}.mtl, texture.png
 
 Worth mentioning is function drawObjectPBR(context, modelMatrix, color, textureId, roughness, metallic, brightness) which is responsible for drawing all objects in scene,
@@ -15,3 +21,7 @@ Worth mentioning is function drawObjectPBR(context, modelMatrix, color, textureI
 
 if textureId is NULL then function draws object with use of single passed color
 else function draws object with texture connected with this textureId
+
+<!-- Link to tasks documentation -->
+## Tasks documentation
+[docs](https://docs.google.com/document/d/15XWFKD8g9I5ik855HuAhfDH8_2lMuJDCnHIDn98vivM/edit?usp=sharing)
