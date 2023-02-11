@@ -86,7 +86,7 @@ float mainLampRotation = 0;
 
 //projections for shadows
 glm::mat4 sunVP = glm::ortho(-25.f, 25.f, -25.f, 25.f, 1.0f, 80.0f) * glm::lookAt(sunPos, sunPos - sunDir, glm::vec3(0,1,0));
-glm::mat4 tableLightVP = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f) * glm::lookAt(spotlightPos, spotlightPos - spotlightConeDir, glm::vec3(0,1,0));
+glm::mat4 tableLightVP = glm::perspective(glm::radians(90.0f), 1.0f, 0.05f, 25.0f) * glm::lookAt(spotlightPos, spotlightPos + spotlightConeDir, glm::vec3(0,1,0));
 
 
 //delta time ------------------------------------------------------------------------------------------------------------------------------------------------------- delta time
@@ -171,7 +171,7 @@ void drawObjectPBR(Core::RenderContext& context, glm::mat4 modelMatrix, glm::vec
 	glBindTexture(GL_TEXTURE_2D, depthMapTableLight);
 	glUniformMatrix4fv(glGetUniformLocation(program, "tableLightVP"), 1, GL_FALSE, (float*)&tableLightVP);
 
-	glActiveTexture(GL_TEXTURE1);
+	glActiveTexture(GL_TEXTURE0+1);
 	glBindTexture(GL_TEXTURE_2D, depthMapSun);
 	glUniformMatrix4fv(glGetUniformLocation(program, "sunVP"), 1, GL_FALSE, (float*)&sunVP);
 
