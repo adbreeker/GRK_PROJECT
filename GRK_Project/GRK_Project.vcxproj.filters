@@ -133,12 +133,6 @@
     <None Include="shaders\shader_shadow.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="shader_lightLamp.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="shader_lightLamp.vert">
-      <Filter>Shader Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GRK_Project.rc">
