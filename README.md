@@ -25,3 +25,10 @@ else function draws object with texture connected with this textureId
 <!-- Link to tasks documentation -->
 ## Tasks documentation
 [docs](https://docs.google.com/document/d/15XWFKD8g9I5ik855HuAhfDH8_2lMuJDCnHIDn98vivM/edit?usp=sharing)
+
+<!-- Video presentation -->
+## Short video presentation of created scene
+
+
+https://user-images.githubusercontent.com/111668308/218335853-f66d2366-c06f-41e9-997c-ccff22489b88.mp4
+
