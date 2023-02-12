@@ -77,8 +77,16 @@ bool animationStateRising = true;
 //door animation
 float doorRotation=0.0f;
 bool animationStarted = false;
+
+//dog animation
 float dogTailRotation = -45.0f;
 bool doggTailRotationIncreasing = true;
+
+//bird animation
+int birdAnimationState = 0;
+bool birdAnimationStateRising = true;
+float birdRotation = 180.0f;
+glm::mat4 birdPos = glm::mat4();
 
 //switch listener
 int switchDelay = 50;
@@ -317,6 +325,66 @@ void animateTail()
 	drawObjectPBR(models::dogTail, glm::mat4()*rotate, glm::vec3(), textures::dogTail, 0.8f, 0.0f, 5.0f);
 }
 
+void animateBird(glm::mat4 startingBirdPos)
+{
+	birdRotation -= 1.0f;
+	if (birdRotation == 0.0f)
+	{
+		birdRotation = 360.0f;
+	}
+	glm::vec3 pivot = glm::vec3(-3.0f, 5.0f, 0.0f);
+	glm::mat4 rotate = rotateAroundPivot(birdRotation, glm::vec3(0, 1, 0), pivot);
+
+	if (birdAnimationStateRising)
+	{
+		if (birdAnimationState < 6)
+		{
+			birdAnimationState++;
+		}
+		else
+		{
+			birdAnimationState--;
+			birdAnimationStateRising = false;
+		}
+	}
+	else
+	{
+		if (birdAnimationState > 0)
+		{
+			birdAnimationState--;
+		}
+		else
+		{
+			birdAnimationState++;
+			birdAnimationStateRising = true;
+		}
+	}
+
+	Core::RenderContext bird;
+	GLuint texture;
+
+	switch (birdAnimationState)
+	{
+	case 0:
+		bird = models::bird0; texture = textures::bird0; break;
+	case 1:
+		bird = models::bird1; texture = textures::bird1; break;
+	case 2:
+		bird = models::bird2; texture = textures::bird2; break;
+	case 3:
+		bird = models::bird3; texture = textures::bird3; break;
+	case 4:
+		bird = models::bird4; texture = textures::bird4; break;
+	case 5:
+		bird = models::bird5; texture = textures::bird5; break;
+	case 6:
+		bird = models::bird6; texture = textures::bird6; break;
+	}
+
+	birdPos = startingBirdPos * rotate;
+	drawObjectPBR(bird, birdPos, glm::vec3(), texture, 0.8f, 0.0f, 5.0f);
+}
+
 
 //render scene objects ----------------------------------------------------------------------------------------------------------------------------------- render scene objects
 void renderSun()
@@ -406,6 +474,14 @@ void renderShadows(GLuint program, GLuint FBO, glm::mat4 VP) {
 	drawObjectDepth(program, models::highHat, VP, glm::mat4());
 	drawObjectDepth(program, models::beret, VP, glm::mat4());
 	drawObjectDepth(program, models::jacket, VP, glm::mat4());
+	drawObjectDepth(program, models::wardrobe, VP, glm::mat4());
+	drawObjectDepth(program, models::cabinet, VP, glm::mat4());
+	drawObjectDepth(program, models::table, VP, glm::mat4());
+	drawObjectDepth(program, models::pot, VP, glm::mat4());
+	drawObjectDepth(program, models::pot, VP, glm::translate(glm::mat4(), glm::vec3(-6.45f, 0.285f, -1.85f)));
+	drawObjectDepth(program, models::pot, VP, glm::translate(glm::mat4(), glm::vec3(-6.35f, 0.285f, -1.45f)));
+	drawObjectDepth(program, models::pot, VP, glm::translate(glm::mat4(), glm::vec3(-6.25f, 0.285f, -2.15f)));
+	drawObjectDepth(program, models::bench, VP, glm::mat4());
 
 	//render environment
 	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(5.3f, 0.0f, 7.0f)));
@@ -431,6 +507,11 @@ void renderShadows(GLuint program, GLuint FBO, glm::mat4 VP) {
 	drawObjectDepth(program, models::rock, VP, glm::translate(glm::mat4(), glm::vec3(7.0f, 0.0f, -0.5f)));
 	drawObjectDepth(program, models::rock, VP, glm::translate(glm::mat4(), glm::vec3(4.5f, 0.0f, -7.0f)));
 	drawObjectDepth(program, models::dog, VP, glm::mat4());
+	drawObjectDepth(program, models::plant, VP, glm::mat4());
+	drawObjectDepth(program, models::plant, VP, glm::translate(glm::mat4(), glm::vec3(-6.45f, 0.285f, -1.85f)));
+	drawObjectDepth(program, models::plant, VP, glm::translate(glm::mat4(), glm::vec3(-6.35f, 0.285f, -1.45f)));
+	drawObjectDepth(program, models::bird2, VP, birdPos);
+
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, WIDTH, HEIGHT);
@@ -512,6 +593,14 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::highHat, glm::mat4(), glm::vec3(), textures::highHat, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::beret, glm::mat4(), glm::vec3(), textures::beret, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::jacket, glm::mat4(), glm::vec3(), textures::jacket, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::wardrobe, glm::mat4(), glm::vec3(), textures::wardrobe, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::cabinet, glm::mat4(), glm::vec3(), textures::cabinet, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::table, glm::mat4(), glm::vec3(), textures::table, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::pot, glm::mat4(), glm::vec3(), textures::pot, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::pot, glm::translate(glm::mat4(), glm::vec3(-6.45f, 0.285f, -1.85f)), glm::vec3(), textures::pot, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::pot, glm::translate(glm::mat4(), glm::vec3(-6.35f, 0.285f, -1.45f)), glm::vec3(), textures::pot, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::pot, glm::translate(glm::mat4(), glm::vec3(-6.25f, 0.285f, -2.15f)), glm::vec3(), textures::pot, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::bench, glm::mat4(), glm::vec3(), textures::bench, 0.8f, 0.0f, 5.0f);
 
 	//render environment
 	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f,0.0f,7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
@@ -538,6 +627,11 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::rock, glm::translate(glm::mat4(), glm::vec3(4.5f, 0.0f, -7.0f)), glm::vec3(), textures::rock, 0.0f, 0.0f, 5.0f);
 	drawObjectPBR(models::dog, glm::mat4(), glm::vec3(), textures::dog, 0.8f, 0.0f, 5.0f);
 	animateTail();
+	drawObjectPBR(models::plant, glm::mat4(), glm::vec3(), textures::plant, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::plant, glm::translate(glm::mat4(), glm::vec3(-6.45f, 0.285f, -1.85f)), glm::vec3(), textures::plant, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::plant, glm::translate(glm::mat4(), glm::vec3(-6.35f, 0.285f, -1.45f)), glm::vec3(), textures::plant, 0.8f, 0.0f, 5.0f);
+	animateBird(glm::translate(glm::mat4(), glm::vec3(0, 2, 0)));
+
 	//render and animate player
 	animatePlayer();
 
@@ -653,24 +747,24 @@ void processInput(GLFWwindow* window)
 	//sunDir
 	//x
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) {
-		sunx += 0.01;
+		sunx += 0.1;
 	}
 	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) {
-		sunx -= 0.01;
+		sunx -= 0.1;
 	}
 	//y
 	if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) {
-		suny += 0.01;
+		suny += 0.1;
 	}
 	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) {
-		suny -= 0.01;
+		suny -= 0.1;
 	}
 	//z
 	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) {
-		sunz += 0.01;
+		sunz += 0.1;
 	}
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) {
-		sunz -= 0.01;
+		sunz -= 0.1;
 	}
 		
 
@@ -678,8 +772,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
 		printf("spaceshipPos = glm::vec3(%ff, %ff, %ff);\n", playerPos.x, playerPos.y, playerPos.z);
 		printf("spaceshipDir = glm::vec3(%ff, %ff, %ff);\n", playerDir.x, playerDir.y, playerDir.z);
-		printf("sunDir = glm::vec3(%ff, %ff, %ff);\n\n", spotlightPos.x, spotlightPos.y, spotlightPos.z);
-		printf("sunDir = glm::vec3(%ff, %ff, %ff);\n\n", spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
+		printf("sunDir = glm::vec3(%ff, %ff, %ff);\n\n", sunx, suny, suny);
 	}
 }
 

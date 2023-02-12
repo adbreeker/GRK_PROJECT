@@ -56,6 +56,11 @@ namespace models
 	Core::RenderContext highHat;
 	Core::RenderContext beret;
 	Core::RenderContext jacket;
+	Core::RenderContext wardrobe;
+	Core::RenderContext cabinet;
+	Core::RenderContext table;
+	Core::RenderContext pot;
+	Core::RenderContext bench;
 
 
 
@@ -73,6 +78,14 @@ namespace models
 	Core::RenderContext rock;
 	Core::RenderContext dog;
 	Core::RenderContext dogTail;
+	Core::RenderContext plant;
+	Core::RenderContext bird0;
+	Core::RenderContext bird1;
+	Core::RenderContext bird2;
+	Core::RenderContext bird3;
+	Core::RenderContext bird4;
+	Core::RenderContext bird5;
+	Core::RenderContext bird6;
 
 }
 
@@ -131,6 +144,11 @@ namespace textures
 	GLuint highHat;
 	GLuint beret;
 	GLuint jacket;
+	GLuint wardrobe;
+	GLuint cabinet;
+	GLuint table;
+	GLuint pot;
+	GLuint bench;
 
 	//player
 	GLuint fly0;
@@ -146,6 +164,14 @@ namespace textures
 	GLuint rock;
 	GLuint dog;
 	GLuint dogTail;
+	GLuint plant;
+	GLuint bird0;
+	GLuint bird1;
+	GLuint bird2;
+	GLuint bird3;
+	GLuint bird4;
+	GLuint bird5;
+	GLuint bird6;
 }
 
 //paths ----------------------------------------------------------------------------------------------------------------------------------------------------------path
@@ -203,6 +229,11 @@ namespace objects_paths
 	std::string highHat = "./models/furnitures/high_hat";
 	std::string beret = "./models/furnitures/beret";
 	std::string jacket = "./models/furnitures/jacket";
+	std::string wardrobe = "./models/furnitures/wardrobe";
+	std::string cabinet = "./models/furnitures/cabinet";
+	std::string table = "./models/furnitures/table";
+	std::string pot = "./models/furnitures/pot";
+	std::string bench = "./models/furnitures/bench";
 
 
 	//player
@@ -219,6 +250,14 @@ namespace objects_paths
 	std::string rock = "./models/environment/rock";
 	std::string dog = "./models/environment/dog";
 	std::string dogTail = "./models/environment/dog_tail";
+	std::string plant = "./models/environment/plant";
+	std::string bird0 = "./models/environment/bird/bird0";
+	std::string bird1 = "./models/environment/bird/bird1";
+	std::string bird2 = "./models/environment/bird/bird2";
+	std::string bird3 = "./models/environment/bird/bird3";
+	std::string bird4 = "./models/environment/bird/bird4";
+	std::string bird5 = "./models/environment/bird/bird5";
+	std::string bird6 = "./models/environment/bird/bird6";
 }
 
 //get certain element path ------------------------------------------------------------------------------------------------------------------ get certain element path
@@ -382,6 +421,11 @@ void loadAllModels()
 	loadModelToContext(objects_paths::highHat, models::highHat, textures::highHat);
 	loadModelToContext(objects_paths::beret, models::beret, textures::beret);
 	loadModelToContext(objects_paths::jacket, models::jacket, textures::jacket);
+	loadModelToContext(objects_paths::wardrobe, models::wardrobe, textures::wardrobe);
+	loadModelToContext(objects_paths::cabinet, models::cabinet, textures::cabinet);
+	loadModelToContext(objects_paths::table, models::table, textures::table);
+	loadModelToContext(objects_paths::pot, models::pot, textures::pot);
+	loadModelToContext(objects_paths::bench, models::bench, textures::bench);
 
 
 	//load player and his texture
@@ -401,4 +445,12 @@ void loadAllModels()
 	loadModelToContext(objects_paths::rock, models::rock, textures::rock);
 	loadModelToContext(objects_paths::dog, models::dog, textures::dog);
 	loadModelToContext(objects_paths::dogTail, models::dogTail, textures::dogTail);
+	loadModelToContext(objects_paths::plant, models::plant, textures::plant);
+	loadModelToContext(objects_paths::bird0, models::bird0, textures::bird0);
+	loadModelToContext(objects_paths::bird1, models::bird1, textures::bird1);
+	loadModelToContext(objects_paths::bird2, models::bird2, textures::bird2);
+	loadModelToContext(objects_paths::bird3, models::bird3, textures::bird3);
+	loadModelToContext(objects_paths::bird4, models::bird4, textures::bird4);
+	loadModelToContext(objects_paths::bird5, models::bird5, textures::bird5);
+	loadModelToContext(objects_paths::bird6, models::bird6, textures::bird6);
 }
