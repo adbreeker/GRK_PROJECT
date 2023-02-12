@@ -48,6 +48,16 @@ namespace models
 	Core::RenderContext foodBowl;
 	Core::RenderContext boneToy;
 	Core::RenderContext tennisBall;
+	Core::RenderContext umbrella;
+	Core::RenderContext umbrellaHolder;
+	Core::RenderContext hatstand;
+	Core::RenderContext hatShelf;
+	Core::RenderContext capHat;
+	Core::RenderContext highHat;
+	Core::RenderContext beret;
+	Core::RenderContext jacket;
+
+
 
 	//player
 	Core::RenderContext fly0;
@@ -113,6 +123,14 @@ namespace textures
 	GLuint foodBowl;
 	GLuint boneToy;
 	GLuint tennisBall;
+	GLuint umbrella;
+	GLuint umbrellaHolder;
+	GLuint hatstand;
+	GLuint hatShelf;
+	GLuint capHat;
+	GLuint highHat;
+	GLuint beret;
+	GLuint jacket;
 
 	//player
 	GLuint fly0;
@@ -177,6 +195,14 @@ namespace objects_paths
 	std::string foodBowl = "./models/furnitures/food_bowl";
 	std::string boneToy = "./models/furnitures/bone_toy";
 	std::string tennisBall = "./models/furnitures/tennis_ball";
+	std::string umbrella = "./models/furnitures/umbrella";
+	std::string umbrellaHolder = "./models/furnitures/umbrella_holder";
+	std::string hatstand = "./models/furnitures/hatstand";
+	std::string hatShelf = "./models/furnitures/hat_shelf";
+	std::string capHat = "./models/furnitures/cap_hat";
+	std::string highHat = "./models/furnitures/high_hat";
+	std::string beret = "./models/furnitures/beret";
+	std::string jacket = "./models/furnitures/jacket";
 
 
 	//player
@@ -348,6 +374,14 @@ void loadAllModels()
 	loadModelToContext(objects_paths::foodBowl, models::foodBowl, textures::foodBowl);
 	loadModelToContext(objects_paths::boneToy, models::boneToy, textures::boneToy);
 	loadModelToContext(objects_paths::tennisBall, models::tennisBall, textures::tennisBall);
+	loadModelToContext(objects_paths::umbrella, models::umbrella, textures::umbrella);
+	loadModelToContext(objects_paths::umbrellaHolder, models::umbrellaHolder, textures::umbrellaHolder);
+	loadModelToContext(objects_paths::hatstand, models::hatstand, textures::hatstand);
+	loadModelToContext(objects_paths::hatShelf, models::hatShelf, textures::hatShelf);
+	loadModelToContext(objects_paths::capHat, models::capHat, textures::capHat);
+	loadModelToContext(objects_paths::highHat, models::highHat, textures::highHat);
+	loadModelToContext(objects_paths::beret, models::beret, textures::beret);
+	loadModelToContext(objects_paths::jacket, models::jacket, textures::jacket);
 
 
 	//load player and his texture

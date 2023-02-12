@@ -1,0 +1,12 @@
+# Blender 3.4.1 MTL File: 'None'
+# www.blender.org
+
+newmtl rain_jacket__adult.001
+Ns 39.999996
+Ka 1.000000 1.000000 1.000000
+Ks 0.045000 0.045000 0.045000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd C:/Users/adamc/OneDrive/Pulpit/rain_jacket__adult_v1_L2.123cc9f9fa01-07ab-482e-b3ea-07fb0f6dba74/rain jacket_ adult_diffuse.jpg

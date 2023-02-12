@@ -348,7 +348,6 @@ void renderSkybox(Core::RenderContext& context, glm::mat4 modelMatrix, GLuint te
 
 void renderShadows(GLuint program, GLuint FBO, glm::mat4 VP) {
 
-	float time = glfwGetTime();
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -399,6 +398,14 @@ void renderShadows(GLuint program, GLuint FBO, glm::mat4 VP) {
 	drawObjectDepth(program, models::foodBowl, VP, glm::mat4());
 	drawObjectDepth(program, models::boneToy, VP, glm::mat4());
 	drawObjectDepth(program, models::tennisBall, VP, glm::mat4());
+	drawObjectDepth(program, models::umbrella, VP, glm::mat4());
+	drawObjectDepth(program, models::umbrellaHolder, VP, glm::mat4());
+	drawObjectDepth(program, models::hatstand, VP, glm::mat4());
+	drawObjectDepth(program, models::hatShelf, VP, glm::mat4());
+	drawObjectDepth(program, models::capHat, VP, glm::mat4());
+	drawObjectDepth(program, models::highHat, VP, glm::mat4());
+	drawObjectDepth(program, models::beret, VP, glm::mat4());
+	drawObjectDepth(program, models::jacket, VP, glm::mat4());
 
 	//render environment
 	drawObjectDepth(program, models::tree, VP, glm::translate(glm::mat4(), glm::vec3(5.3f, 0.0f, 7.0f)));
@@ -432,6 +439,8 @@ void renderShadows(GLuint program, GLuint FBO, glm::mat4 VP) {
 //render scene --------------------------------------------------------------------------------- render scene
 void renderScene(GLFWwindow* window)
 {
+
+
 	//shadows
 	renderShadows(programDepth, depthMapSunFBO, sunVP);
 	renderShadows(programDepth, depthMapTableLightFBO, tableLightVP);
@@ -495,6 +504,14 @@ void renderScene(GLFWwindow* window)
 	drawObjectPBR(models::foodBowl, glm::mat4(), glm::vec3(), textures::foodBowl, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::boneToy, glm::mat4(), glm::vec3(), textures::boneToy, 0.8f, 0.0f, 5.0f);
 	drawObjectPBR(models::tennisBall, glm::mat4(), glm::vec3(), textures::tennisBall, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::umbrella, glm::mat4(), glm::vec3(), textures::umbrella, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::umbrellaHolder, glm::mat4(), glm::vec3(), textures::umbrellaHolder, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::hatstand, glm::mat4(), glm::vec3(), textures::hatstand, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::hatShelf, glm::mat4(), glm::vec3(), textures::hatShelf, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::capHat, glm::mat4(), glm::vec3(), textures::capHat, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::highHat, glm::mat4(), glm::vec3(), textures::highHat, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::beret, glm::mat4(), glm::vec3(), textures::beret, 0.8f, 0.0f, 5.0f);
+	drawObjectPBR(models::jacket, glm::mat4(), glm::vec3(), textures::jacket, 0.8f, 0.0f, 5.0f);
 
 	//render environment
 	drawObjectPBR(models::tree, glm::translate(glm::mat4(), glm::vec3(5.3f,0.0f,7.0f)), glm::vec3(), textures::tree, 0.0f, 0.0f, 5.0f);
@@ -569,6 +586,7 @@ void shutdown(GLFWwindow* window)
 	shaderLoader.DeleteProgram(programTex);
 	shaderLoader.DeleteProgram(programSun);
 	shaderLoader.DeleteProgram(programSkybox);
+	shaderLoader.DeleteProgram(programDepth);
 }
 
 
