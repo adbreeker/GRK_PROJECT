@@ -26,6 +26,17 @@ else function draws object with texture connected with this textureId
 ## Tasks documentation
 [docs](https://docs.google.com/document/d/15XWFKD8g9I5ik855HuAhfDH8_2lMuJDCnHIDn98vivM/edit?usp=sharing)
 
+<!-- List of objects -->
+## List of objects
+
+1. Objects downloaded from internet:
+   - bug(player) (modified and animated by us)
+   - dog (modified and animated by us)
+   - bird (modfied and animated by us)
+   - jacket
+2. Objects created by us:
+   -
+
 <!-- Video presentation -->
 ## Short video presentation of created scene
 
