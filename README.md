@@ -4,6 +4,8 @@
 ## Table of Contents
 * [Project description](#description)
 * [Link to tasks documentation](#tasks-documentation)
+* [List of objects](#list-of-objects)
+* [Video presentation](#short-video-presentation-of-created-scene)
 
 <!-- Project description -->
 ## Description
@@ -34,6 +36,8 @@ else function draws object with texture connected with this textureId
    - dog (modified and animated by us)
    - bird (modfied and animated by us)
    - jacket
+   - books (modified by us)
+   - open book (modified by us)
 2. Objects created by us:
    - barbells
    - bench
@@ -64,6 +68,7 @@ else function draws object with texture connected with this textureId
    - shelf
    - skybox
    - stool
+   - switch
    - table
    - table lamp
    - tennis ball
@@ -75,6 +80,16 @@ else function draws object with texture connected with this textureId
    - water bowl
 3. Objects from project base:
    - bed 
+   - chair
+   - desk (modified by us)
+   - door (modified by us)
+   - drawer
+   - windows (modified by us)
+   - jamb (modified by us)
+   - marble bust
+   - mattres
+   - pencils
+   - room (modifed by us)
 
 <!-- Video presentation -->
 ## Short video presentation of created scene
