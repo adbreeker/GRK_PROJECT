@@ -82,7 +82,7 @@ else function draws object with texture connected with this textureId
    - bed 
    - chair
    - desk (modified by us)
-   - door (modified by us)
+   - door (modified and animated by us)
    - drawer
    - windows (modified by us)
    - jamb (modified by us)
