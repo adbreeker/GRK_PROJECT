@@ -34,7 +34,7 @@ else function draws object with texture connected with this textureId
 1. Objects downloaded from internet:
    - bug(player) (modified and animated by us)
    - dog (modified and animated by us)
-   - bird (modfied and animated by us)
+   - bird (modified and animated by us)
    - jacket
    - books (modified by us)
    - open book (modified by us)
@@ -87,9 +87,9 @@ else function draws object with texture connected with this textureId
    - windows (modified by us)
    - jamb (modified by us)
    - marble bust
-   - mattres
+   - mattress
    - pencils
-   - room (modifed by us)
+   - room (modified by us)
 
 <!-- Video presentation -->
 ## Short video presentation of created scene
